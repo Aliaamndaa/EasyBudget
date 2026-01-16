@@ -1,16 +1,44 @@
-# smartattendface
+EasyBudget AI
+EasyBudget AI is a mobile application developed to help users manage their personal finances more efficiently. The app allows users to track expenses, scan receipts using OCR, and view spending summaries through a simple and user-friendly interface.
 
-A new Flutter project.
+Project Overview
+Managing daily expenses manually can be time-consuming and error-prone. EasyBudget AI simplifies this process by allowing users to scan receipts and automatically extract expense information, reducing manual input and improving accuracy.
 
-## Getting Started
+This project was developed as part of my academic work and later enhanced for innovation competitions.
 
-This project is a starting point for a Flutter application.
+Key Features
+OCR-based receipt scanning
+Automatic expense data extraction
+Manual expense entry
+Expense categorization
+Monthly spending summary
+Tax-related expense tracking
+Technologies Used
+Flutter (Mobile Application)
+PHP (Backend API)
+MySQL (Database)
+Tesseract OCR
+RESTful APIs
+Android Studio
+Git & GitHub
+My Role
+Lead Developer
+Designed the overall system architecture
+Developed the mobile application using Flutter
+Implemented OCR receipt scanning functionality
+Built backend APIs and database structure
+Integrated frontend and backend services
+Performed testing, debugging, and feature improvements
+Achievements
+Gold Medal – Jejak Inovasi 2025
+Fully developed and presented as an academic innovation project
+Demo Video
+A short demonstration of the application can be viewed here: https://youtu.be/45goi5951U8
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Future Improvements
+AI-based spending predictions
+Cloud data synchronization
+Improved OCR accuracy
+Budget goal recommendations
+Notes
+This project is intended for learning and demonstration purposes. Sensitive information such as API keys and credentials have been excluded from this repository.
