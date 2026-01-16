@@ -1,0 +1,155 @@
+<html>
+<head>
+<title>AllTransactionsScreen.dart</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #bcbec4;}
+.s1 { color: #6aab73;}
+.s2 { color: #bcbec4;}
+.s3 { color: #7a7e85;}
+.s4 { color: #cf8e6d;}
+.s5 { color: #2aacb8;}
+</style>
+</head>
+<body bgcolor="#1e1f22">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+AllTransactionsScreen.dart</font>
+</center></td></tr></table>
+<pre><span class="s0">import </span><span class="s1">'package:flutter/material.dart'</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">'package:http/http.dart' </span><span class="s0">as http</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">'dart:convert'</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">'package:intl/intl.dart'</span><span class="s2">; </span><span class="s3">// for date formatting</span>
+
+<span class="s4">class </span><span class="s0">AllTransactionsScreen </span><span class="s4">extends </span><span class="s0">StatefulWidget </span><span class="s2">{</span>
+  <span class="s4">final </span><span class="s0">String email</span><span class="s2">;</span>
+
+  <span class="s4">const </span><span class="s0">AllTransactionsScreen</span><span class="s2">({</span><span class="s0">Key</span><span class="s2">? </span><span class="s0">key</span><span class="s2">, </span><span class="s0">required </span><span class="s4">this</span><span class="s2">.</span><span class="s0">email</span><span class="s2">}) : </span><span class="s4">super</span><span class="s2">(</span><span class="s0">key</span><span class="s2">: </span><span class="s0">key</span><span class="s2">);</span>
+
+  <span class="s0">@override</span>
+  <span class="s0">State</span><span class="s2">&lt;</span><span class="s0">AllTransactionsScreen</span><span class="s2">&gt; </span><span class="s0">createState</span><span class="s2">() =&gt; </span><span class="s0">_AllTransactionsScreenState</span><span class="s2">();</span>
+<span class="s2">}</span>
+
+<span class="s4">class </span><span class="s0">_AllTransactionsScreenState </span><span class="s4">extends </span><span class="s0">State</span><span class="s2">&lt;</span><span class="s0">AllTransactionsScreen</span><span class="s2">&gt; {</span>
+  <span class="s0">List</span><span class="s2">&lt;</span><span class="s0">Map</span><span class="s2">&lt;</span><span class="s0">String</span><span class="s2">, </span><span class="s0">dynamic</span><span class="s2">&gt;&gt; </span><span class="s0">_transactions </span><span class="s2">= [];</span>
+  <span class="s0">bool isLoading </span><span class="s2">= </span><span class="s4">true</span><span class="s2">;</span>
+
+  <span class="s0">Future</span><span class="s2">&lt;</span><span class="s4">void</span><span class="s2">&gt; </span><span class="s0">_fetchAllTransactions</span><span class="s2">() </span><span class="s0">async </span><span class="s2">{</span>
+    <span class="s4">try </span><span class="s2">{</span>
+      <span class="s4">final </span><span class="s0">response </span><span class="s2">= </span><span class="s0">await http</span><span class="s2">.</span><span class="s0">post</span><span class="s2">(</span>
+        <span class="s0">Uri</span><span class="s2">.</span><span class="s0">parse</span><span class="s2">(</span><span class="s1">'http://192.168.0.15/get_all_transactions.php'</span><span class="s2">),</span>
+        <span class="s0">body</span><span class="s2">: {</span><span class="s1">'email'</span><span class="s2">: </span><span class="s0">widget</span><span class="s2">.</span><span class="s0">email</span><span class="s2">},</span>
+      <span class="s2">);</span>
+
+      <span class="s4">if </span><span class="s2">(</span><span class="s0">response</span><span class="s2">.</span><span class="s0">statusCode </span><span class="s2">== </span><span class="s5">200</span><span class="s2">) {</span>
+        <span class="s4">final </span><span class="s0">List</span><span class="s2">&lt;</span><span class="s0">dynamic</span><span class="s2">&gt; </span><span class="s0">data </span><span class="s2">= </span><span class="s0">json</span><span class="s2">.</span><span class="s0">decode</span><span class="s2">(</span><span class="s0">response</span><span class="s2">.</span><span class="s0">body</span><span class="s2">);</span>
+        <span class="s0">setState</span><span class="s2">(() {</span>
+          <span class="s0">_transactions </span><span class="s2">= </span><span class="s0">List</span><span class="s2">&lt;</span><span class="s0">Map</span><span class="s2">&lt;</span><span class="s0">String</span><span class="s2">, </span><span class="s0">dynamic</span><span class="s2">&gt;&gt;.</span><span class="s0">from</span><span class="s2">(</span><span class="s0">data</span><span class="s2">);</span>
+          <span class="s0">isLoading </span><span class="s2">= </span><span class="s4">false</span><span class="s2">;</span>
+        <span class="s2">});</span>
+      <span class="s2">} </span><span class="s4">else </span><span class="s2">{</span>
+        <span class="s0">print</span><span class="s2">(</span><span class="s1">'Failed to load all transactions'</span><span class="s2">);</span>
+        <span class="s0">setState</span><span class="s2">(() =&gt; </span><span class="s0">isLoading </span><span class="s2">= </span><span class="s4">false</span><span class="s2">);</span>
+      <span class="s2">}</span>
+    <span class="s2">} </span><span class="s4">catch </span><span class="s2">(</span><span class="s0">e</span><span class="s2">) {</span>
+      <span class="s0">print</span><span class="s2">(</span><span class="s1">'Error fetching all transactions: </span><span class="s2">$</span><span class="s0">e</span><span class="s1">'</span><span class="s2">);</span>
+      <span class="s0">setState</span><span class="s2">(() =&gt; </span><span class="s0">isLoading </span><span class="s2">= </span><span class="s4">false</span><span class="s2">);</span>
+    <span class="s2">}</span>
+  <span class="s2">}</span>
+
+  <span class="s0">String getEmojiForCategory</span><span class="s2">(</span><span class="s0">String category</span><span class="s2">, </span><span class="s0">String type</span><span class="s2">) {</span>
+    <span class="s4">switch </span><span class="s2">(</span><span class="s0">category</span><span class="s2">.</span><span class="s0">toLowerCase</span><span class="s2">()) {</span>
+      <span class="s4">case </span><span class="s1">'food'</span><span class="s2">:</span>
+        <span class="s4">return </span><span class="s1">'🍔'</span><span class="s2">;</span>
+      <span class="s4">case </span><span class="s1">'transport'</span><span class="s2">:</span>
+        <span class="s4">return </span><span class="s1">'🚇'</span><span class="s2">;</span>
+      <span class="s4">case </span><span class="s1">'utilities'</span><span class="s2">:</span>
+        <span class="s4">return </span><span class="s1">'💡'</span><span class="s2">;</span>
+      <span class="s4">case </span><span class="s1">'shopping'</span><span class="s2">:</span>
+        <span class="s4">return </span><span class="s1">'🛍️'</span><span class="s2">;</span>
+      <span class="s4">case </span><span class="s1">'health'</span><span class="s2">:</span>
+        <span class="s4">return </span><span class="s1">'❤️'</span><span class="s2">;</span>
+      <span class="s4">case </span><span class="s1">'entertainment'</span><span class="s2">:</span>
+        <span class="s4">return </span><span class="s1">'🍿'</span><span class="s2">;</span>
+      <span class="s4">default</span><span class="s2">:</span>
+        <span class="s4">return </span><span class="s0">type</span><span class="s2">.</span><span class="s0">toLowerCase</span><span class="s2">() == </span><span class="s1">'income' </span><span class="s2">? </span><span class="s1">'💸' </span><span class="s2">: </span><span class="s1">'💰'</span><span class="s2">;</span>
+    <span class="s2">}</span>
+  <span class="s2">}</span>
+
+  <span class="s0">String formatDate</span><span class="s2">(</span><span class="s0">String rawDate</span><span class="s2">) {</span>
+    <span class="s4">try </span><span class="s2">{</span>
+      <span class="s4">final </span><span class="s0">date </span><span class="s2">= </span><span class="s0">DateTime</span><span class="s2">.</span><span class="s0">parse</span><span class="s2">(</span><span class="s0">rawDate</span><span class="s2">);</span>
+      <span class="s4">return </span><span class="s0">DateFormat</span><span class="s2">(</span><span class="s1">'d MMM yyyy'</span><span class="s2">).</span><span class="s0">format</span><span class="s2">(</span><span class="s0">date</span><span class="s2">);</span>
+    <span class="s2">} </span><span class="s4">catch </span><span class="s2">(</span><span class="s0">_</span><span class="s2">) {</span>
+      <span class="s4">return </span><span class="s0">rawDate</span><span class="s2">;</span>
+    <span class="s2">}</span>
+  <span class="s2">}</span>
+
+  <span class="s0">@override</span>
+  <span class="s4">void </span><span class="s0">initState</span><span class="s2">() {</span>
+    <span class="s4">super</span><span class="s2">.</span><span class="s0">initState</span><span class="s2">();</span>
+    <span class="s0">_fetchAllTransactions</span><span class="s2">();</span>
+  <span class="s2">}</span>
+
+  <span class="s0">@override</span>
+  <span class="s0">Widget build</span><span class="s2">(</span><span class="s0">BuildContext context</span><span class="s2">) {</span>
+    <span class="s4">return </span><span class="s0">Scaffold</span><span class="s2">(</span>
+      <span class="s0">appBar</span><span class="s2">: </span><span class="s0">AppBar</span><span class="s2">(</span><span class="s0">title</span><span class="s2">: </span><span class="s4">const </span><span class="s0">Text</span><span class="s2">(</span><span class="s1">'All Transactions'</span><span class="s2">)),</span>
+      <span class="s0">body</span><span class="s2">: </span><span class="s0">isLoading</span>
+          <span class="s2">? </span><span class="s4">const </span><span class="s0">Center</span><span class="s2">(</span><span class="s0">child</span><span class="s2">: </span><span class="s0">CircularProgressIndicator</span><span class="s2">())</span>
+          <span class="s2">: </span><span class="s0">_transactions</span><span class="s2">.</span><span class="s0">isEmpty</span>
+          <span class="s2">? </span><span class="s4">const </span><span class="s0">Center</span><span class="s2">(</span><span class="s0">child</span><span class="s2">: </span><span class="s0">Text</span><span class="s2">(</span><span class="s1">'No transactions found.'</span><span class="s2">))</span>
+          <span class="s2">: </span><span class="s0">ListView</span><span class="s2">.</span><span class="s0">builder</span><span class="s2">(</span>
+        <span class="s0">padding</span><span class="s2">: </span><span class="s4">const </span><span class="s0">EdgeInsets</span><span class="s2">.</span><span class="s0">all</span><span class="s2">(</span><span class="s5">12</span><span class="s2">),</span>
+        <span class="s0">itemCount</span><span class="s2">: </span><span class="s0">_transactions</span><span class="s2">.</span><span class="s0">length</span><span class="s2">,</span>
+        <span class="s0">itemBuilder</span><span class="s2">: (</span><span class="s0">context</span><span class="s2">, </span><span class="s0">index</span><span class="s2">) {</span>
+          <span class="s4">final </span><span class="s0">txn </span><span class="s2">= </span><span class="s0">_transactions</span><span class="s2">[</span><span class="s0">index</span><span class="s2">];</span>
+          <span class="s4">final </span><span class="s0">category </span><span class="s2">= </span><span class="s0">txn</span><span class="s2">[</span><span class="s1">'category'</span><span class="s2">] ?? </span><span class="s1">'Other'</span><span class="s2">;</span>
+          <span class="s4">final </span><span class="s0">type </span><span class="s2">= </span><span class="s0">txn</span><span class="s2">[</span><span class="s1">'type'</span><span class="s2">] ?? </span><span class="s1">'expense'</span><span class="s2">;</span>
+          <span class="s4">final </span><span class="s0">emoji </span><span class="s2">= </span><span class="s0">getEmojiForCategory</span><span class="s2">(</span><span class="s0">category</span><span class="s2">, </span><span class="s0">type</span><span class="s2">);</span>
+          <span class="s4">final </span><span class="s0">date </span><span class="s2">= </span><span class="s0">formatDate</span><span class="s2">(</span><span class="s0">txn</span><span class="s2">[</span><span class="s1">'date'</span><span class="s2">] ?? </span><span class="s1">''</span><span class="s2">);</span>
+          <span class="s4">final </span><span class="s0">amount </span><span class="s2">= </span><span class="s0">txn</span><span class="s2">[</span><span class="s1">'amount'</span><span class="s2">] ?? </span><span class="s1">'0.00'</span><span class="s2">;</span>
+          <span class="s4">final </span><span class="s0">title </span><span class="s2">= </span><span class="s0">txn</span><span class="s2">[</span><span class="s1">'title'</span><span class="s2">] ?? </span><span class="s0">category</span><span class="s2">;</span>
+          <span class="s4">final </span><span class="s0">amountColor </span><span class="s2">= </span><span class="s0">type </span><span class="s2">== </span><span class="s1">'income' </span><span class="s2">? </span><span class="s0">Colors</span><span class="s2">.</span><span class="s0">green </span><span class="s2">: </span><span class="s0">Colors</span><span class="s2">.</span><span class="s0">red</span><span class="s2">;</span>
+
+          <span class="s4">return </span><span class="s0">Card</span><span class="s2">(</span>
+            <span class="s0">shape</span><span class="s2">: </span><span class="s0">RoundedRectangleBorder</span><span class="s2">(</span><span class="s0">borderRadius</span><span class="s2">: </span><span class="s0">BorderRadius</span><span class="s2">.</span><span class="s0">circular</span><span class="s2">(</span><span class="s5">16</span><span class="s2">)),</span>
+            <span class="s0">elevation</span><span class="s2">: </span><span class="s5">4</span><span class="s2">,</span>
+            <span class="s0">margin</span><span class="s2">: </span><span class="s4">const </span><span class="s0">EdgeInsets</span><span class="s2">.</span><span class="s0">symmetric</span><span class="s2">(</span><span class="s0">vertical</span><span class="s2">: </span><span class="s5">8</span><span class="s2">),</span>
+            <span class="s0">child</span><span class="s2">: </span><span class="s0">ListTile</span><span class="s2">(</span>
+              <span class="s0">contentPadding</span><span class="s2">: </span><span class="s4">const </span><span class="s0">EdgeInsets</span><span class="s2">.</span><span class="s0">all</span><span class="s2">(</span><span class="s5">16</span><span class="s2">),</span>
+              <span class="s0">leading</span><span class="s2">: </span><span class="s0">CircleAvatar</span><span class="s2">(</span>
+                <span class="s0">radius</span><span class="s2">: </span><span class="s5">24</span><span class="s2">,</span>
+                <span class="s0">backgroundColor</span><span class="s2">: </span><span class="s0">Colors</span><span class="s2">.</span><span class="s0">grey</span><span class="s2">.</span><span class="s0">shade200</span><span class="s2">,</span>
+                <span class="s0">child</span><span class="s2">: </span><span class="s0">Text</span><span class="s2">(</span>
+                  <span class="s0">emoji</span><span class="s2">,</span>
+                  <span class="s0">style</span><span class="s2">: </span><span class="s4">const </span><span class="s0">TextStyle</span><span class="s2">(</span><span class="s0">fontSize</span><span class="s2">: </span><span class="s5">24</span><span class="s2">),</span>
+                <span class="s2">),</span>
+              <span class="s2">),</span>
+              <span class="s0">title</span><span class="s2">: </span><span class="s0">Text</span><span class="s2">(</span>
+                <span class="s0">title</span><span class="s2">,</span>
+                <span class="s0">style</span><span class="s2">: </span><span class="s4">const </span><span class="s0">TextStyle</span><span class="s2">(</span><span class="s0">fontWeight</span><span class="s2">: </span><span class="s0">FontWeight</span><span class="s2">.</span><span class="s0">bold</span><span class="s2">, </span><span class="s0">fontSize</span><span class="s2">: </span><span class="s5">16</span><span class="s2">),</span>
+              <span class="s2">),</span>
+              <span class="s0">subtitle</span><span class="s2">: </span><span class="s0">Text</span><span class="s2">(</span>
+                <span class="s0">date</span><span class="s2">,</span>
+                <span class="s0">style</span><span class="s2">: </span><span class="s4">const </span><span class="s0">TextStyle</span><span class="s2">(</span><span class="s0">color</span><span class="s2">: </span><span class="s0">Colors</span><span class="s2">.</span><span class="s0">grey</span><span class="s2">),</span>
+              <span class="s2">),</span>
+              <span class="s0">trailing</span><span class="s2">: </span><span class="s0">Text</span><span class="s2">(</span>
+                <span class="s1">'RM</span><span class="s2">$</span><span class="s0">amount</span><span class="s1">'</span><span class="s2">,</span>
+                <span class="s0">style</span><span class="s2">: </span><span class="s0">TextStyle</span><span class="s2">(</span>
+                  <span class="s0">color</span><span class="s2">: </span><span class="s0">amountColor</span><span class="s2">,</span>
+                  <span class="s0">fontWeight</span><span class="s2">: </span><span class="s0">FontWeight</span><span class="s2">.</span><span class="s0">bold</span><span class="s2">,</span>
+                  <span class="s0">fontSize</span><span class="s2">: </span><span class="s5">16</span><span class="s2">,</span>
+                <span class="s2">),</span>
+              <span class="s2">),</span>
+            <span class="s2">),</span>
+          <span class="s2">);</span>
+        <span class="s2">},</span>
+      <span class="s2">),</span>
+    <span class="s2">);</span>
+  <span class="s2">}</span>
+<span class="s2">}</span>
+</pre>
+</body>
+</html>

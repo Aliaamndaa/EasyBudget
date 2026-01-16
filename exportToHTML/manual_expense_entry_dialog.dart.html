@@ -1,0 +1,172 @@
+<html>
+<head>
+<title>manual_expense_entry_dialog.dart</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #bcbec4;}
+.s1 { color: #6aab73;}
+.s2 { color: #bcbec4;}
+.s3 { color: #cf8e6d;}
+.s4 { color: #2aacb8;}
+</style>
+</head>
+<body bgcolor="#1e1f22">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+manual_expense_entry_dialog.dart</font>
+</center></td></tr></table>
+<pre><span class="s0">import </span><span class="s1">'package:flutter/material.dart'</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">'package:http/http.dart' </span><span class="s0">as http</span><span class="s2">;</span>
+
+<span class="s3">class </span><span class="s0">ManualExpenseEntryDialog </span><span class="s3">extends </span><span class="s0">StatefulWidget </span><span class="s2">{</span>
+  <span class="s3">final </span><span class="s0">String userEmail</span><span class="s2">;</span>
+  <span class="s3">final </span><span class="s0">Function</span><span class="s2">(</span><span class="s0">String category</span><span class="s2">, </span><span class="s0">double amount</span><span class="s2">, </span><span class="s0">String</span><span class="s2">? </span><span class="s0">description</span><span class="s2">)? </span><span class="s0">onExpenseAddedLocally</span><span class="s2">;</span>
+  <span class="s3">final </span><span class="s0">List</span><span class="s2">&lt;</span><span class="s0">String</span><span class="s2">&gt; </span><span class="s0">categories</span><span class="s2">;</span>
+
+  <span class="s3">const </span><span class="s0">ManualExpenseEntryDialog</span><span class="s2">({</span>
+    <span class="s0">Key</span><span class="s2">? </span><span class="s0">key</span><span class="s2">,</span>
+    <span class="s0">required </span><span class="s3">this</span><span class="s2">.</span><span class="s0">userEmail</span><span class="s2">,</span>
+    <span class="s3">this</span><span class="s2">.</span><span class="s0">onExpenseAddedLocally</span><span class="s2">,</span>
+    <span class="s0">required </span><span class="s3">this</span><span class="s2">.</span><span class="s0">categories</span><span class="s2">,</span>
+  <span class="s2">}) : </span><span class="s3">super</span><span class="s2">(</span><span class="s0">key</span><span class="s2">: </span><span class="s0">key</span><span class="s2">);</span>
+
+  <span class="s0">@override</span>
+  <span class="s0">State</span><span class="s2">&lt;</span><span class="s0">ManualExpenseEntryDialog</span><span class="s2">&gt; </span><span class="s0">createState</span><span class="s2">() =&gt; </span><span class="s0">_ManualExpenseEntryDialogState</span><span class="s2">();</span>
+<span class="s2">}</span>
+
+<span class="s3">class </span><span class="s0">_ManualExpenseEntryDialogState </span><span class="s3">extends </span><span class="s0">State</span><span class="s2">&lt;</span><span class="s0">ManualExpenseEntryDialog</span><span class="s2">&gt; {</span>
+  <span class="s0">String</span><span class="s2">? </span><span class="s0">_selectedCategory</span><span class="s2">;</span>
+  <span class="s3">final </span><span class="s0">TextEditingController _amountController </span><span class="s2">= </span><span class="s0">TextEditingController</span><span class="s2">();</span>
+  <span class="s3">final </span><span class="s0">TextEditingController _descriptionController </span><span class="s2">= </span><span class="s0">TextEditingController</span><span class="s2">();</span>
+  <span class="s0">DateTime</span><span class="s2">? </span><span class="s0">_selectedDate </span><span class="s2">= </span><span class="s0">DateTime</span><span class="s2">.</span><span class="s0">now</span><span class="s2">();</span>
+
+  <span class="s0">Future</span><span class="s2">&lt;</span><span class="s3">void</span><span class="s2">&gt; </span><span class="s0">_addTaxClaimToServer</span><span class="s2">() </span><span class="s0">async </span><span class="s2">{</span>
+    <span class="s3">final </span><span class="s0">String amount </span><span class="s2">= </span><span class="s0">_amountController</span><span class="s2">.</span><span class="s0">text</span><span class="s2">;</span>
+    <span class="s3">final </span><span class="s0">String</span><span class="s2">? </span><span class="s0">category </span><span class="s2">= </span><span class="s0">_selectedCategory</span><span class="s2">;</span>
+    <span class="s3">final </span><span class="s0">String description </span><span class="s2">= </span><span class="s0">_descriptionController</span><span class="s2">.</span><span class="s0">text</span><span class="s2">.</span><span class="s0">trim</span><span class="s2">();</span>
+    <span class="s3">final </span><span class="s0">String date </span><span class="s2">= </span><span class="s0">_selectedDate</span><span class="s2">?.</span><span class="s0">toIso8601String</span><span class="s2">().</span><span class="s0">split</span><span class="s2">(</span><span class="s1">'T'</span><span class="s2">)[</span><span class="s4">0</span><span class="s2">] ?? </span><span class="s1">''</span><span class="s2">;</span>
+
+    <span class="s3">if </span><span class="s2">(</span><span class="s0">category </span><span class="s2">!= </span><span class="s3">null </span><span class="s2">&amp;&amp; </span><span class="s0">amount</span><span class="s2">.</span><span class="s0">isNotEmpty </span><span class="s2">&amp;&amp; </span><span class="s0">date</span><span class="s2">.</span><span class="s0">isNotEmpty</span><span class="s2">) {</span>
+      <span class="s3">try </span><span class="s2">{</span>
+        <span class="s3">final </span><span class="s0">response </span><span class="s2">= </span><span class="s0">await http</span><span class="s2">.</span><span class="s0">post</span><span class="s2">(</span>
+          <span class="s0">Uri</span><span class="s2">.</span><span class="s0">parse</span><span class="s2">(</span><span class="s1">'http://192.168.0.15/add_tax_claim.php'</span><span class="s2">),</span>
+          <span class="s0">body</span><span class="s2">: {</span>
+            <span class="s1">'email'</span><span class="s2">: </span><span class="s0">widget</span><span class="s2">.</span><span class="s0">userEmail</span><span class="s2">,</span>
+            <span class="s1">'category'</span><span class="s2">: </span><span class="s0">category</span><span class="s2">,</span>
+            <span class="s1">'amount'</span><span class="s2">: </span><span class="s0">amount</span><span class="s2">,</span>
+            <span class="s1">'description'</span><span class="s2">: </span><span class="s0">description</span><span class="s2">,</span>
+            <span class="s1">'claim_date'</span><span class="s2">: </span><span class="s0">date</span><span class="s2">,</span>
+          <span class="s2">},</span>
+        <span class="s2">);</span>
+
+        <span class="s3">if </span><span class="s2">(</span><span class="s0">response</span><span class="s2">.</span><span class="s0">statusCode </span><span class="s2">== </span><span class="s4">200 </span><span class="s2">&amp;&amp; </span><span class="s0">response</span><span class="s2">.</span><span class="s0">body</span><span class="s2">.</span><span class="s0">trim</span><span class="s2">() == </span><span class="s1">&quot;success&quot;</span><span class="s2">) {</span>
+          <span class="s0">ScaffoldMessenger</span><span class="s2">.</span><span class="s0">of</span><span class="s2">(</span><span class="s0">context</span><span class="s2">).</span><span class="s0">showSnackBar</span><span class="s2">(</span>
+            <span class="s3">const </span><span class="s0">SnackBar</span><span class="s2">(</span><span class="s0">content</span><span class="s2">: </span><span class="s0">Text</span><span class="s2">(</span><span class="s1">&quot;Tax claim added successfully.&quot;</span><span class="s2">)),</span>
+          <span class="s2">);</span>
+          <span class="s0">Navigator</span><span class="s2">.</span><span class="s0">of</span><span class="s2">(</span><span class="s0">context</span><span class="s2">).</span><span class="s0">pop</span><span class="s2">();</span>
+          <span class="s3">if </span><span class="s2">(</span><span class="s0">widget</span><span class="s2">.</span><span class="s0">onExpenseAddedLocally </span><span class="s2">!= </span><span class="s3">null</span><span class="s2">) {</span>
+            <span class="s3">final </span><span class="s0">double</span><span class="s2">? </span><span class="s0">parsedAmount </span><span class="s2">= </span><span class="s0">double</span><span class="s2">.</span><span class="s0">tryParse</span><span class="s2">(</span><span class="s0">amount</span><span class="s2">);</span>
+            <span class="s3">if </span><span class="s2">(</span><span class="s0">parsedAmount </span><span class="s2">!= </span><span class="s3">null</span><span class="s2">) {</span>
+              <span class="s0">widget</span><span class="s2">.</span><span class="s0">onExpenseAddedLocally</span><span class="s2">!(</span><span class="s0">category</span><span class="s2">, </span><span class="s0">parsedAmount</span><span class="s2">, </span><span class="s0">description</span><span class="s2">);</span>
+            <span class="s2">}</span>
+          <span class="s2">}</span>
+        <span class="s2">} </span><span class="s3">else </span><span class="s2">{</span>
+          <span class="s0">ScaffoldMessenger</span><span class="s2">.</span><span class="s0">of</span><span class="s2">(</span><span class="s0">context</span><span class="s2">).</span><span class="s0">showSnackBar</span><span class="s2">(</span>
+            <span class="s0">SnackBar</span><span class="s2">(</span><span class="s0">content</span><span class="s2">: </span><span class="s0">Text</span><span class="s2">(</span><span class="s1">&quot;Failed to add tax claim. Status: </span><span class="s2">${</span><span class="s0">response</span><span class="s2">.</span><span class="s0">statusCode</span><span class="s2">}</span><span class="s1">, Body: </span><span class="s2">${</span><span class="s0">response</span><span class="s2">.</span><span class="s0">body</span><span class="s2">}</span><span class="s1">&quot;</span><span class="s2">)),</span>
+          <span class="s2">);</span>
+        <span class="s2">}</span>
+      <span class="s2">} </span><span class="s3">catch </span><span class="s2">(</span><span class="s0">e</span><span class="s2">) {</span>
+        <span class="s0">ScaffoldMessenger</span><span class="s2">.</span><span class="s0">of</span><span class="s2">(</span><span class="s0">context</span><span class="s2">).</span><span class="s0">showSnackBar</span><span class="s2">(</span>
+          <span class="s3">const </span><span class="s0">SnackBar</span><span class="s2">(</span><span class="s0">content</span><span class="s2">: </span><span class="s0">Text</span><span class="s2">(</span><span class="s1">&quot;Error: Failed to connect to server.&quot;</span><span class="s2">)),</span>
+        <span class="s2">);</span>
+      <span class="s2">}</span>
+    <span class="s2">} </span><span class="s3">else </span><span class="s2">{</span>
+      <span class="s0">ScaffoldMessenger</span><span class="s2">.</span><span class="s0">of</span><span class="s2">(</span><span class="s0">context</span><span class="s2">).</span><span class="s0">showSnackBar</span><span class="s2">(</span>
+        <span class="s3">const </span><span class="s0">SnackBar</span><span class="s2">(</span><span class="s0">content</span><span class="s2">: </span><span class="s0">Text</span><span class="s2">(</span><span class="s1">&quot;Please select a category, enter the amount, and select a date.&quot;</span><span class="s2">)),</span>
+      <span class="s2">);</span>
+    <span class="s2">}</span>
+  <span class="s2">}</span>
+
+  <span class="s0">Future</span><span class="s2">&lt;</span><span class="s3">void</span><span class="s2">&gt; </span><span class="s0">_selectDate</span><span class="s2">(</span><span class="s0">BuildContext context</span><span class="s2">) </span><span class="s0">async </span><span class="s2">{</span>
+    <span class="s3">final </span><span class="s0">DateTime</span><span class="s2">? </span><span class="s0">picked </span><span class="s2">= </span><span class="s0">await showDatePicker</span><span class="s2">(</span>
+      <span class="s0">context</span><span class="s2">: </span><span class="s0">context</span><span class="s2">,</span>
+      <span class="s0">initialDate</span><span class="s2">: </span><span class="s0">_selectedDate </span><span class="s2">?? </span><span class="s0">DateTime</span><span class="s2">.</span><span class="s0">now</span><span class="s2">(),</span>
+      <span class="s0">firstDate</span><span class="s2">: </span><span class="s0">DateTime</span><span class="s2">(</span><span class="s4">2000</span><span class="s2">),</span>
+      <span class="s0">lastDate</span><span class="s2">: </span><span class="s0">DateTime</span><span class="s2">(</span><span class="s4">2101</span><span class="s2">),</span>
+    <span class="s2">);</span>
+    <span class="s3">if </span><span class="s2">(</span><span class="s0">picked </span><span class="s2">!= </span><span class="s3">null </span><span class="s2">&amp;&amp; </span><span class="s0">picked </span><span class="s2">!= </span><span class="s0">_selectedDate</span><span class="s2">) {</span>
+      <span class="s0">setState</span><span class="s2">(() {</span>
+        <span class="s0">_selectedDate </span><span class="s2">= </span><span class="s0">picked</span><span class="s2">;</span>
+      <span class="s2">});</span>
+    <span class="s2">}</span>
+  <span class="s2">}</span>
+
+  <span class="s0">@override</span>
+  <span class="s0">Widget build</span><span class="s2">(</span><span class="s0">BuildContext context</span><span class="s2">) {</span>
+    <span class="s3">return </span><span class="s0">AlertDialog</span><span class="s2">(</span>
+      <span class="s0">title</span><span class="s2">: </span><span class="s3">const </span><span class="s0">Text</span><span class="s2">(</span><span class="s1">'Enter Expense Manually'</span><span class="s2">),</span>
+      <span class="s0">content</span><span class="s2">: </span><span class="s0">SingleChildScrollView</span><span class="s2">(</span>
+        <span class="s0">child</span><span class="s2">: </span><span class="s0">Column</span><span class="s2">(</span>
+          <span class="s0">crossAxisAlignment</span><span class="s2">: </span><span class="s0">CrossAxisAlignment</span><span class="s2">.</span><span class="s0">start</span><span class="s2">,</span>
+          <span class="s0">children</span><span class="s2">: &lt;</span><span class="s0">Widget</span><span class="s2">&gt;[</span>
+            <span class="s0">DropdownButtonFormField</span><span class="s2">&lt;</span><span class="s0">String</span><span class="s2">&gt;(</span>
+              <span class="s0">decoration</span><span class="s2">: </span><span class="s3">const </span><span class="s0">InputDecoration</span><span class="s2">(</span><span class="s0">labelText</span><span class="s2">: </span><span class="s1">'Category'</span><span class="s2">),</span>
+              <span class="s0">value</span><span class="s2">: </span><span class="s0">_selectedCategory</span><span class="s2">,</span>
+              <span class="s0">items</span><span class="s2">: </span><span class="s0">widget</span><span class="s2">.</span><span class="s0">categories</span><span class="s2">.</span><span class="s0">map</span><span class="s2">((</span><span class="s0">String value</span><span class="s2">) {</span>
+                <span class="s3">return </span><span class="s0">DropdownMenuItem</span><span class="s2">&lt;</span><span class="s0">String</span><span class="s2">&gt;(</span>
+                  <span class="s0">value</span><span class="s2">: </span><span class="s0">value</span><span class="s2">,</span>
+                  <span class="s0">child</span><span class="s2">: </span><span class="s0">Text</span><span class="s2">(</span><span class="s0">value</span><span class="s2">),</span>
+                <span class="s2">);</span>
+              <span class="s2">}).</span><span class="s0">toList</span><span class="s2">(),</span>
+              <span class="s0">onChanged</span><span class="s2">: (</span><span class="s0">String</span><span class="s2">? </span><span class="s0">newValue</span><span class="s2">) {</span>
+                <span class="s0">setState</span><span class="s2">(() {</span>
+                  <span class="s0">_selectedCategory </span><span class="s2">= </span><span class="s0">newValue</span><span class="s2">;</span>
+                <span class="s2">});</span>
+              <span class="s2">},</span>
+            <span class="s2">),</span>
+            <span class="s0">TextFormField</span><span class="s2">(</span>
+              <span class="s0">controller</span><span class="s2">: </span><span class="s0">_amountController</span><span class="s2">,</span>
+              <span class="s0">keyboardType</span><span class="s2">: </span><span class="s3">const </span><span class="s0">TextInputType</span><span class="s2">.</span><span class="s0">numberWithOptions</span><span class="s2">(</span><span class="s0">decimal</span><span class="s2">: </span><span class="s3">true</span><span class="s2">),</span>
+              <span class="s0">decoration</span><span class="s2">: </span><span class="s3">const </span><span class="s0">InputDecoration</span><span class="s2">(</span><span class="s0">labelText</span><span class="s2">: </span><span class="s1">'Amount (RM)'</span><span class="s2">),</span>
+            <span class="s2">),</span>
+            <span class="s0">TextFormField</span><span class="s2">(</span>
+              <span class="s0">controller</span><span class="s2">: </span><span class="s0">_descriptionController</span><span class="s2">,</span>
+              <span class="s0">decoration</span><span class="s2">: </span><span class="s3">const </span><span class="s0">InputDecoration</span><span class="s2">(</span><span class="s0">labelText</span><span class="s2">: </span><span class="s1">'Description (Optional)'</span><span class="s2">),</span>
+              <span class="s0">maxLines</span><span class="s2">: </span><span class="s4">2</span><span class="s2">,</span>
+            <span class="s2">),</span>
+            <span class="s3">const </span><span class="s0">SizedBox</span><span class="s2">(</span><span class="s0">height</span><span class="s2">: </span><span class="s4">20</span><span class="s2">),</span>
+            <span class="s0">Row</span><span class="s2">(</span>
+              <span class="s0">mainAxisAlignment</span><span class="s2">: </span><span class="s0">MainAxisAlignment</span><span class="s2">.</span><span class="s0">spaceBetween</span><span class="s2">,</span>
+              <span class="s0">children</span><span class="s2">: [</span>
+                <span class="s3">const </span><span class="s0">Text</span><span class="s2">(</span><span class="s1">&quot;Claim Date:&quot;</span><span class="s2">, </span><span class="s0">style</span><span class="s2">: </span><span class="s0">TextStyle</span><span class="s2">(</span><span class="s0">fontSize</span><span class="s2">: </span><span class="s4">16</span><span class="s2">)),</span>
+                <span class="s0">TextButton</span><span class="s2">(</span>
+                  <span class="s0">onPressed</span><span class="s2">: () =&gt; </span><span class="s0">_selectDate</span><span class="s2">(</span><span class="s0">context</span><span class="s2">),</span>
+                  <span class="s0">child</span><span class="s2">: </span><span class="s0">Text</span><span class="s2">(</span>
+                    <span class="s0">_selectedDate </span><span class="s2">!= </span><span class="s3">null</span>
+                        <span class="s2">? </span><span class="s1">&quot;</span><span class="s2">${</span><span class="s0">_selectedDate</span><span class="s2">!.</span><span class="s0">toLocal</span><span class="s2">()}</span><span class="s1">&quot;</span><span class="s2">.</span><span class="s0">split</span><span class="s2">(</span><span class="s1">' '</span><span class="s2">)[</span><span class="s4">0</span><span class="s2">]</span>
+                        <span class="s2">: </span><span class="s1">'Pick a Date'</span><span class="s2">,</span>
+                    <span class="s0">style</span><span class="s2">: </span><span class="s3">const </span><span class="s0">TextStyle</span><span class="s2">(</span><span class="s0">fontSize</span><span class="s2">: </span><span class="s4">16</span><span class="s2">, </span><span class="s0">color</span><span class="s2">: </span><span class="s0">Color</span><span class="s2">(</span><span class="s4">0xFFD4AF37</span><span class="s2">)),</span>
+                  <span class="s2">),</span>
+                <span class="s2">),</span>
+              <span class="s2">],</span>
+            <span class="s2">),</span>
+          <span class="s2">],</span>
+        <span class="s2">),</span>
+      <span class="s2">),</span>
+      <span class="s0">actions</span><span class="s2">: &lt;</span><span class="s0">Widget</span><span class="s2">&gt;[</span>
+        <span class="s0">TextButton</span><span class="s2">(</span>
+          <span class="s0">onPressed</span><span class="s2">: () =&gt; </span><span class="s0">Navigator</span><span class="s2">.</span><span class="s0">of</span><span class="s2">(</span><span class="s0">context</span><span class="s2">).</span><span class="s0">pop</span><span class="s2">(),</span>
+          <span class="s0">child</span><span class="s2">: </span><span class="s3">const </span><span class="s0">Text</span><span class="s2">(</span><span class="s1">'Cancel'</span><span class="s2">),</span>
+        <span class="s2">),</span>
+        <span class="s0">ElevatedButton</span><span class="s2">(</span>
+          <span class="s0">onPressed</span><span class="s2">: </span><span class="s0">_addTaxClaimToServer</span><span class="s2">,</span>
+          <span class="s0">child</span><span class="s2">: </span><span class="s3">const </span><span class="s0">Text</span><span class="s2">(</span><span class="s1">'Add'</span><span class="s2">),</span>
+        <span class="s2">),</span>
+      <span class="s2">],</span>
+    <span class="s2">);</span>
+  <span class="s2">}</span>
+<span class="s2">}</span>
+</pre>
+</body>
+</html>

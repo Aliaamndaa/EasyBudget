@@ -1,0 +1,157 @@
+<html>
+<head>
+<title>ManageExpenseScreen .dart</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #bcbec4;}
+.s1 { color: #6aab73;}
+.s2 { color: #bcbec4;}
+.s3 { color: #cf8e6d;}
+.s4 { color: #2aacb8;}
+.s5 { color: #7a7e85;}
+</style>
+</head>
+<body bgcolor="#1e1f22">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+ManageExpenseScreen .dart</font>
+</center></td></tr></table>
+<pre><span class="s0">import </span><span class="s1">'package:flutter/material.dart'</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">'AddExpenseScreen.dart'</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">'package:http/http.dart' </span><span class="s0">as http</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">'dart:convert'</span><span class="s2">;</span>
+
+<span class="s3">class </span><span class="s0">ManageExpenseScreen </span><span class="s3">extends </span><span class="s0">StatefulWidget </span><span class="s2">{</span>
+  <span class="s3">final </span><span class="s0">String email</span><span class="s2">;</span>
+
+  <span class="s3">const </span><span class="s0">ManageExpenseScreen</span><span class="s2">({</span><span class="s0">Key</span><span class="s2">? </span><span class="s0">key</span><span class="s2">, </span><span class="s0">required </span><span class="s3">this</span><span class="s2">.</span><span class="s0">email</span><span class="s2">}) : </span><span class="s3">super</span><span class="s2">(</span><span class="s0">key</span><span class="s2">: </span><span class="s0">key</span><span class="s2">);</span>
+
+  <span class="s0">@override</span>
+  <span class="s0">_ManageExpenseScreenState createState</span><span class="s2">() =&gt; </span><span class="s0">_ManageExpenseScreenState</span><span class="s2">();</span>
+<span class="s2">}</span>
+
+<span class="s3">class </span><span class="s0">_ManageExpenseScreenState </span><span class="s3">extends </span><span class="s0">State</span><span class="s2">&lt;</span><span class="s0">ManageExpenseScreen</span><span class="s2">&gt; {</span>
+  <span class="s0">List</span><span class="s2">&lt;</span><span class="s0">dynamic</span><span class="s2">&gt; </span><span class="s0">_expenses </span><span class="s2">= [];</span>
+
+  <span class="s0">@override</span>
+  <span class="s3">void </span><span class="s0">initState</span><span class="s2">() {</span>
+    <span class="s3">super</span><span class="s2">.</span><span class="s0">initState</span><span class="s2">();</span>
+    <span class="s0">fetchExpenses</span><span class="s2">();</span>
+  <span class="s2">}</span>
+
+  <span class="s0">Future</span><span class="s2">&lt;</span><span class="s3">void</span><span class="s2">&gt; </span><span class="s0">fetchExpenses</span><span class="s2">() </span><span class="s0">async </span><span class="s2">{</span>
+    <span class="s3">final </span><span class="s0">response </span><span class="s2">= </span><span class="s0">await http</span><span class="s2">.</span><span class="s0">post</span><span class="s2">(</span>
+      <span class="s0">Uri</span><span class="s2">.</span><span class="s0">parse</span><span class="s2">(</span><span class="s1">'http://192.168.0.15/get_expenses.php'</span><span class="s2">),</span>
+      <span class="s0">body</span><span class="s2">: {</span><span class="s1">'email'</span><span class="s2">: </span><span class="s0">widget</span><span class="s2">.</span><span class="s0">email</span><span class="s2">},</span>
+    <span class="s2">);</span>
+
+    <span class="s3">if </span><span class="s2">(</span><span class="s0">response</span><span class="s2">.</span><span class="s0">statusCode </span><span class="s2">== </span><span class="s4">200</span><span class="s2">) {</span>
+      <span class="s0">setState</span><span class="s2">(() {</span>
+        <span class="s0">_expenses </span><span class="s2">= </span><span class="s0">json</span><span class="s2">.</span><span class="s0">decode</span><span class="s2">(</span><span class="s0">response</span><span class="s2">.</span><span class="s0">body</span><span class="s2">);</span>
+      <span class="s2">});</span>
+    <span class="s2">} </span><span class="s3">else </span><span class="s2">{</span>
+      <span class="s3">throw </span><span class="s0">Exception</span><span class="s2">(</span><span class="s1">'Failed to load expenses'</span><span class="s2">);</span>
+    <span class="s2">}</span>
+  <span class="s2">}</span>
+
+  <span class="s0">Future</span><span class="s2">&lt;</span><span class="s3">void</span><span class="s2">&gt; </span><span class="s0">deleteExpense</span><span class="s2">(</span><span class="s0">String id</span><span class="s2">) </span><span class="s0">async </span><span class="s2">{</span>
+    <span class="s3">final </span><span class="s0">response </span><span class="s2">= </span><span class="s0">await http</span><span class="s2">.</span><span class="s0">post</span><span class="s2">(</span>
+      <span class="s0">Uri</span><span class="s2">.</span><span class="s0">parse</span><span class="s2">(</span><span class="s1">'http://192.168.0.15/delete_expense.php'</span><span class="s2">),</span>
+      <span class="s0">body</span><span class="s2">: {</span><span class="s1">'id'</span><span class="s2">: </span><span class="s0">id</span><span class="s2">},</span>
+    <span class="s2">);</span>
+
+    <span class="s3">if </span><span class="s2">(</span><span class="s0">response</span><span class="s2">.</span><span class="s0">statusCode </span><span class="s2">== </span><span class="s4">200</span><span class="s2">) {</span>
+      <span class="s0">fetchExpenses</span><span class="s2">(); </span><span class="s5">// Refresh after delete</span>
+    <span class="s2">} </span><span class="s3">else </span><span class="s2">{</span>
+      <span class="s3">throw </span><span class="s0">Exception</span><span class="s2">(</span><span class="s1">'Failed to delete expense'</span><span class="s2">);</span>
+    <span class="s2">}</span>
+  <span class="s2">}</span>
+
+  <span class="s3">void </span><span class="s0">_confirmDelete</span><span class="s2">(</span><span class="s0">String id</span><span class="s2">) {</span>
+    <span class="s0">showDialog</span><span class="s2">(</span>
+      <span class="s0">context</span><span class="s2">: </span><span class="s0">context</span><span class="s2">,</span>
+      <span class="s0">builder</span><span class="s2">: (</span><span class="s0">ctx</span><span class="s2">) =&gt; </span><span class="s0">AlertDialog</span><span class="s2">(</span>
+        <span class="s0">title</span><span class="s2">: </span><span class="s0">Text</span><span class="s2">(</span><span class="s1">'Confirm Delete'</span><span class="s2">),</span>
+        <span class="s0">content</span><span class="s2">: </span><span class="s0">Text</span><span class="s2">(</span><span class="s1">'Are you sure you want to delete this expense?'</span><span class="s2">),</span>
+        <span class="s0">actions</span><span class="s2">: [</span>
+          <span class="s0">TextButton</span><span class="s2">(</span>
+            <span class="s0">onPressed</span><span class="s2">: () =&gt; </span><span class="s0">Navigator</span><span class="s2">.</span><span class="s0">of</span><span class="s2">(</span><span class="s0">ctx</span><span class="s2">).</span><span class="s0">pop</span><span class="s2">(),</span>
+            <span class="s0">child</span><span class="s2">: </span><span class="s0">Text</span><span class="s2">(</span><span class="s1">'Cancel'</span><span class="s2">),</span>
+          <span class="s2">),</span>
+          <span class="s0">TextButton</span><span class="s2">(</span>
+            <span class="s0">onPressed</span><span class="s2">: () {</span>
+              <span class="s0">Navigator</span><span class="s2">.</span><span class="s0">of</span><span class="s2">(</span><span class="s0">ctx</span><span class="s2">).</span><span class="s0">pop</span><span class="s2">();</span>
+              <span class="s0">deleteExpense</span><span class="s2">(</span><span class="s0">id</span><span class="s2">);</span>
+            <span class="s2">},</span>
+            <span class="s0">child</span><span class="s2">: </span><span class="s0">Text</span><span class="s2">(</span><span class="s1">'Delete'</span><span class="s2">, </span><span class="s0">style</span><span class="s2">: </span><span class="s0">TextStyle</span><span class="s2">(</span><span class="s0">color</span><span class="s2">: </span><span class="s0">Colors</span><span class="s2">.</span><span class="s0">red</span><span class="s2">)),</span>
+          <span class="s2">),</span>
+        <span class="s2">],</span>
+      <span class="s2">),</span>
+    <span class="s2">);</span>
+  <span class="s2">}</span>
+
+  <span class="s0">@override</span>
+  <span class="s0">Widget build</span><span class="s2">(</span><span class="s0">BuildContext context</span><span class="s2">) {</span>
+    <span class="s3">return </span><span class="s0">Scaffold</span><span class="s2">(</span>
+      <span class="s0">appBar</span><span class="s2">: </span><span class="s0">AppBar</span><span class="s2">(</span>
+        <span class="s0">title</span><span class="s2">: </span><span class="s0">Text</span><span class="s2">(</span><span class="s1">'Manage Expenses'</span><span class="s2">),</span>
+      <span class="s2">),</span>
+      <span class="s0">body</span><span class="s2">: </span><span class="s0">ListView</span><span class="s2">.</span><span class="s0">builder</span><span class="s2">(</span>
+        <span class="s0">itemCount</span><span class="s2">: </span><span class="s0">_expenses</span><span class="s2">.</span><span class="s0">length</span><span class="s2">,</span>
+        <span class="s0">itemBuilder</span><span class="s2">: (</span><span class="s0">context</span><span class="s2">, </span><span class="s0">index</span><span class="s2">) {</span>
+          <span class="s3">final </span><span class="s0">expense </span><span class="s2">= </span><span class="s0">_expenses</span><span class="s2">[</span><span class="s0">index</span><span class="s2">];</span>
+          <span class="s3">return </span><span class="s0">Card</span><span class="s2">(</span>
+            <span class="s0">margin</span><span class="s2">: </span><span class="s0">EdgeInsets</span><span class="s2">.</span><span class="s0">all</span><span class="s2">(</span><span class="s4">8</span><span class="s2">),</span>
+            <span class="s0">child</span><span class="s2">: </span><span class="s0">ListTile</span><span class="s2">(</span>
+              <span class="s0">title</span><span class="s2">: </span><span class="s0">Text</span><span class="s2">(</span><span class="s0">expense</span><span class="s2">[</span><span class="s1">'description'</span><span class="s2">]),</span>
+              <span class="s0">subtitle</span><span class="s2">: </span><span class="s0">Text</span><span class="s2">(</span><span class="s1">'Amount: RM</span><span class="s2">${</span><span class="s0">expense</span><span class="s2">[</span><span class="s1">'amount'</span><span class="s2">]} </span><span class="s1">• Category: </span><span class="s2">${</span><span class="s0">expense</span><span class="s2">[</span><span class="s1">'category'</span><span class="s2">]}</span><span class="s1">'</span><span class="s2">),</span>
+              <span class="s0">trailing</span><span class="s2">: </span><span class="s0">Row</span><span class="s2">(</span>
+                <span class="s0">mainAxisSize</span><span class="s2">: </span><span class="s0">MainAxisSize</span><span class="s2">.</span><span class="s0">min</span><span class="s2">,</span>
+                <span class="s0">children</span><span class="s2">: [</span>
+                  <span class="s0">IconButton</span><span class="s2">(</span>
+                    <span class="s0">icon</span><span class="s2">: </span><span class="s0">Icon</span><span class="s2">(</span><span class="s0">Icons</span><span class="s2">.</span><span class="s0">edit</span><span class="s2">, </span><span class="s0">color</span><span class="s2">: </span><span class="s0">Colors</span><span class="s2">.</span><span class="s0">blue</span><span class="s2">),</span>
+                    <span class="s0">onPressed</span><span class="s2">: () {</span>
+                      <span class="s0">Navigator</span><span class="s2">.</span><span class="s0">push</span><span class="s2">(</span>
+                        <span class="s0">context</span><span class="s2">,</span>
+                        <span class="s0">MaterialPageRoute</span><span class="s2">(</span>
+                          <span class="s0">builder</span><span class="s2">: (</span><span class="s0">context</span><span class="s2">) =&gt; </span><span class="s0">AddExpenseScreen</span><span class="s2">(</span>
+                            <span class="s0">email</span><span class="s2">: </span><span class="s0">widget</span><span class="s2">.</span><span class="s0">email</span><span class="s2">,</span>
+                           <span class="s5">// isEditing: true,</span>
+                           <span class="s5">// expenseData: expense,</span>
+                          <span class="s2">),</span>
+                        <span class="s2">),</span>
+                      <span class="s2">).</span><span class="s0">then</span><span class="s2">((</span><span class="s0">_</span><span class="s2">) =&gt; </span><span class="s0">fetchExpenses</span><span class="s2">());</span>
+                    <span class="s2">},</span>
+                  <span class="s2">),</span>
+                  <span class="s0">IconButton</span><span class="s2">(</span>
+                    <span class="s0">icon</span><span class="s2">: </span><span class="s0">Icon</span><span class="s2">(</span><span class="s0">Icons</span><span class="s2">.</span><span class="s0">delete</span><span class="s2">, </span><span class="s0">color</span><span class="s2">: </span><span class="s0">Colors</span><span class="s2">.</span><span class="s0">red</span><span class="s2">),</span>
+                    <span class="s0">onPressed</span><span class="s2">: () =&gt; </span><span class="s0">_confirmDelete</span><span class="s2">(</span><span class="s0">expense</span><span class="s2">[</span><span class="s1">'id'</span><span class="s2">]),</span>
+                  <span class="s2">),</span>
+                <span class="s2">],</span>
+              <span class="s2">),</span>
+            <span class="s2">),</span>
+          <span class="s2">);</span>
+        <span class="s2">},</span>
+      <span class="s2">),</span>
+      <span class="s0">floatingActionButton</span><span class="s2">: </span><span class="s0">FloatingActionButton</span><span class="s2">(</span>
+        <span class="s0">onPressed</span><span class="s2">: () {</span>
+          <span class="s0">Navigator</span><span class="s2">.</span><span class="s0">push</span><span class="s2">(</span>
+            <span class="s0">context</span><span class="s2">,</span>
+            <span class="s0">MaterialPageRoute</span><span class="s2">(</span>
+              <span class="s0">builder</span><span class="s2">: (</span><span class="s0">context</span><span class="s2">) =&gt; </span><span class="s0">AddExpenseScreen</span><span class="s2">(</span>
+                <span class="s0">email</span><span class="s2">: </span><span class="s0">widget</span><span class="s2">.</span><span class="s0">email</span><span class="s2">,</span>
+               <span class="s5">// isEditing: false,</span>
+              <span class="s2">),</span>
+            <span class="s2">),</span>
+          <span class="s2">).</span><span class="s0">then</span><span class="s2">((</span><span class="s0">_</span><span class="s2">) =&gt; </span><span class="s0">fetchExpenses</span><span class="s2">());</span>
+        <span class="s2">},</span>
+        <span class="s0">child</span><span class="s2">: </span><span class="s0">Icon</span><span class="s2">(</span><span class="s0">Icons</span><span class="s2">.</span><span class="s0">add</span><span class="s2">),</span>
+        <span class="s0">tooltip</span><span class="s2">: </span><span class="s1">'Add Expense'</span><span class="s2">,</span>
+      <span class="s2">),</span>
+    <span class="s2">);</span>
+  <span class="s2">}</span>
+<span class="s2">}</span>
+</pre>
+</body>
+</html>

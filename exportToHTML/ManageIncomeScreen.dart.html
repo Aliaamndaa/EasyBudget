@@ -1,0 +1,380 @@
+<html>
+<head>
+<title>ManageIncomeScreen.dart</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #7a7e85;}
+.s1 { color: #bcbec4;}
+.s2 { color: #6aab73;}
+.s3 { color: #bcbec4;}
+.s4 { color: #cf8e6d;}
+.s5 { color: #2aacb8;}
+</style>
+</head>
+<body bgcolor="#1e1f22">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+ManageIncomeScreen.dart</font>
+</center></td></tr></table>
+<pre><span class="s0">// ManageIncomeScreen.dart</span>
+<span class="s1">import </span><span class="s2">'package:flutter/material.dart'</span><span class="s3">;</span>
+<span class="s1">import </span><span class="s2">'package:intl/intl.dart'</span><span class="s3">;</span>
+<span class="s1">import </span><span class="s2">'package:http/http.dart' </span><span class="s1">as http</span><span class="s3">;</span>
+<span class="s1">import </span><span class="s2">'dart:convert'</span><span class="s3">;</span>
+
+<span class="s4">class </span><span class="s1">ManageIncomeScreen </span><span class="s4">extends </span><span class="s1">StatefulWidget </span><span class="s3">{</span>
+  <span class="s4">final </span><span class="s1">String email</span><span class="s3">;</span>
+  <span class="s4">const </span><span class="s1">ManageIncomeScreen</span><span class="s3">({</span><span class="s1">Key</span><span class="s3">? </span><span class="s1">key</span><span class="s3">, </span><span class="s1">required </span><span class="s4">this</span><span class="s3">.</span><span class="s1">email</span><span class="s3">}) : </span><span class="s4">super</span><span class="s3">(</span><span class="s1">key</span><span class="s3">: </span><span class="s1">key</span><span class="s3">);</span>
+
+  <span class="s1">@override</span>
+  <span class="s1">State</span><span class="s3">&lt;</span><span class="s1">ManageIncomeScreen</span><span class="s3">&gt; </span><span class="s1">createState</span><span class="s3">() =&gt; </span><span class="s1">_ManageIncomeScreenState</span><span class="s3">();</span>
+<span class="s3">}</span>
+
+<span class="s4">class </span><span class="s1">_ManageIncomeScreenState </span><span class="s4">extends </span><span class="s1">State</span><span class="s3">&lt;</span><span class="s1">ManageIncomeScreen</span><span class="s3">&gt; {</span>
+  <span class="s1">static </span><span class="s4">const </span><span class="s1">_gold </span><span class="s3">= </span><span class="s1">Color</span><span class="s3">(</span><span class="s5">0xFFD4AF37</span><span class="s3">);</span>
+
+  <span class="s1">double _totalIncome </span><span class="s3">= </span><span class="s5">0.0</span><span class="s3">;</span>
+  <span class="s1">bool _loadingTotal </span><span class="s3">= </span><span class="s4">true</span><span class="s3">;</span>
+
+  <span class="s1">bool _showList </span><span class="s3">= </span><span class="s4">false</span><span class="s3">;</span>
+  <span class="s1">bool _loadingList </span><span class="s3">= </span><span class="s4">false</span><span class="s3">;</span>
+  <span class="s1">List</span><span class="s3">&lt;</span><span class="s1">Map</span><span class="s3">&lt;</span><span class="s1">String</span><span class="s3">, </span><span class="s1">dynamic</span><span class="s3">&gt;&gt; </span><span class="s1">_incomes </span><span class="s3">= [];</span>
+
+  <span class="s1">@override</span>
+  <span class="s4">void </span><span class="s1">initState</span><span class="s3">() {</span>
+    <span class="s4">super</span><span class="s3">.</span><span class="s1">initState</span><span class="s3">();</span>
+    <span class="s1">_fetchTotalIncome</span><span class="s3">();</span>
+  <span class="s3">}</span>
+
+  <span class="s1">Future</span><span class="s3">&lt;</span><span class="s4">void</span><span class="s3">&gt; </span><span class="s1">_fetchTotalIncome</span><span class="s3">() </span><span class="s1">async </span><span class="s3">{</span>
+    <span class="s1">setState</span><span class="s3">(() =&gt; </span><span class="s1">_loadingTotal </span><span class="s3">= </span><span class="s4">true</span><span class="s3">);</span>
+    <span class="s4">try </span><span class="s3">{</span>
+      <span class="s4">final </span><span class="s1">res </span><span class="s3">= </span><span class="s1">await http</span><span class="s3">.</span><span class="s1">get</span><span class="s3">(</span>
+          <span class="s1">Uri</span><span class="s3">.</span><span class="s1">parse</span><span class="s3">(</span><span class="s2">'http://192.168.0.15/get_income.php?email=</span><span class="s3">${</span><span class="s1">widget</span><span class="s3">.</span><span class="s1">email</span><span class="s3">}</span><span class="s2">'</span><span class="s3">));</span>
+      <span class="s4">if </span><span class="s3">(</span><span class="s1">res</span><span class="s3">.</span><span class="s1">statusCode </span><span class="s3">== </span><span class="s5">200</span><span class="s3">) {</span>
+        <span class="s4">final </span><span class="s1">data </span><span class="s3">= </span><span class="s1">json</span><span class="s3">.</span><span class="s1">decode</span><span class="s3">(</span><span class="s1">res</span><span class="s3">.</span><span class="s1">body</span><span class="s3">);</span>
+        <span class="s1">setState</span><span class="s3">(() {</span>
+          <span class="s1">_totalIncome </span><span class="s3">= </span><span class="s1">double</span><span class="s3">.</span><span class="s1">tryParse</span><span class="s3">(</span><span class="s1">data</span><span class="s3">[</span><span class="s2">'income'</span><span class="s3">].</span><span class="s1">toString</span><span class="s3">()) ?? </span><span class="s5">0.0</span><span class="s3">;</span>
+          <span class="s1">_loadingTotal </span><span class="s3">= </span><span class="s4">false</span><span class="s3">;</span>
+        <span class="s3">});</span>
+      <span class="s3">} </span><span class="s4">else </span><span class="s3">{</span>
+        <span class="s4">throw </span><span class="s1">Exception</span><span class="s3">(</span><span class="s2">'Status </span><span class="s3">${</span><span class="s1">res</span><span class="s3">.</span><span class="s1">statusCode</span><span class="s3">}</span><span class="s2">'</span><span class="s3">);</span>
+      <span class="s3">}</span>
+    <span class="s3">} </span><span class="s4">catch </span><span class="s3">(</span><span class="s1">e</span><span class="s3">) {</span>
+      <span class="s1">debugPrint</span><span class="s3">(</span><span class="s2">'Total income error: </span><span class="s3">$</span><span class="s1">e</span><span class="s2">'</span><span class="s3">);</span>
+      <span class="s1">setState</span><span class="s3">(() =&gt; </span><span class="s1">_loadingTotal </span><span class="s3">= </span><span class="s4">false</span><span class="s3">);</span>
+    <span class="s3">}</span>
+  <span class="s3">}</span>
+
+  <span class="s1">Future</span><span class="s3">&lt;</span><span class="s4">void</span><span class="s3">&gt; </span><span class="s1">_fetchIncomeList</span><span class="s3">() </span><span class="s1">async </span><span class="s3">{</span>
+    <span class="s1">setState</span><span class="s3">(() =&gt; </span><span class="s1">_loadingList </span><span class="s3">= </span><span class="s4">true</span><span class="s3">);</span>
+    <span class="s4">try </span><span class="s3">{</span>
+      <span class="s4">final </span><span class="s1">res </span><span class="s3">= </span><span class="s1">await http</span><span class="s3">.</span><span class="s1">post</span><span class="s3">(</span>
+        <span class="s1">Uri</span><span class="s3">.</span><span class="s1">parse</span><span class="s3">(</span><span class="s2">'http://192.168.0.15/get_income_list.php'</span><span class="s3">),</span>
+        <span class="s1">body</span><span class="s3">: {</span><span class="s2">'email'</span><span class="s3">: </span><span class="s1">widget</span><span class="s3">.</span><span class="s1">email</span><span class="s3">},</span>
+      <span class="s3">);</span>
+      <span class="s4">if </span><span class="s3">(</span><span class="s1">res</span><span class="s3">.</span><span class="s1">statusCode </span><span class="s3">== </span><span class="s5">200</span><span class="s3">) {</span>
+        <span class="s4">final </span><span class="s1">decoded </span><span class="s3">= </span><span class="s1">json</span><span class="s3">.</span><span class="s1">decode</span><span class="s3">(</span><span class="s1">res</span><span class="s3">.</span><span class="s1">body</span><span class="s3">);</span>
+        <span class="s1">setState</span><span class="s3">(() {</span>
+          <span class="s1">_incomes </span><span class="s3">= </span><span class="s1">List</span><span class="s3">&lt;</span><span class="s1">Map</span><span class="s3">&lt;</span><span class="s1">String</span><span class="s3">, </span><span class="s1">dynamic</span><span class="s3">&gt;&gt;.</span><span class="s1">from</span><span class="s3">(</span><span class="s1">decoded</span><span class="s3">);</span>
+          <span class="s1">_loadingList </span><span class="s3">= </span><span class="s4">false</span><span class="s3">;</span>
+        <span class="s3">});</span>
+      <span class="s3">} </span><span class="s4">else </span><span class="s3">{</span>
+        <span class="s4">throw </span><span class="s1">Exception</span><span class="s3">(</span><span class="s2">'Status </span><span class="s3">${</span><span class="s1">res</span><span class="s3">.</span><span class="s1">statusCode</span><span class="s3">}</span><span class="s2">'</span><span class="s3">);</span>
+      <span class="s3">}</span>
+    <span class="s3">} </span><span class="s4">catch </span><span class="s3">(</span><span class="s1">e</span><span class="s3">) {</span>
+      <span class="s1">debugPrint</span><span class="s3">(</span><span class="s2">'Income list error: </span><span class="s3">$</span><span class="s1">e</span><span class="s2">'</span><span class="s3">);</span>
+      <span class="s1">setState</span><span class="s3">(() =&gt; </span><span class="s1">_loadingList </span><span class="s3">= </span><span class="s4">false</span><span class="s3">);</span>
+    <span class="s3">}</span>
+  <span class="s3">}</span>
+
+  <span class="s1">Future</span><span class="s3">&lt;</span><span class="s1">bool</span><span class="s3">&gt; </span><span class="s1">_showConfirmationDialog</span><span class="s3">(</span><span class="s1">String message</span><span class="s3">) </span><span class="s1">async </span><span class="s3">{</span>
+    <span class="s4">return </span><span class="s3">(</span><span class="s1">await showDialog</span><span class="s3">&lt;</span><span class="s1">bool</span><span class="s3">&gt;(</span>
+      <span class="s1">context</span><span class="s3">: </span><span class="s1">context</span><span class="s3">,</span>
+      <span class="s1">builder</span><span class="s3">: (</span><span class="s1">context</span><span class="s3">) =&gt; </span><span class="s1">AlertDialog</span><span class="s3">(</span>
+        <span class="s1">title</span><span class="s3">: </span><span class="s4">const </span><span class="s1">Text</span><span class="s3">(</span><span class="s2">'Confirm'</span><span class="s3">),</span>
+        <span class="s1">content</span><span class="s3">: </span><span class="s1">Text</span><span class="s3">(</span><span class="s1">message</span><span class="s3">),</span>
+        <span class="s1">actions</span><span class="s3">: [</span>
+          <span class="s1">TextButton</span><span class="s3">(</span>
+            <span class="s1">onPressed</span><span class="s3">: () =&gt; </span><span class="s1">Navigator</span><span class="s3">.</span><span class="s1">of</span><span class="s3">(</span><span class="s1">context</span><span class="s3">).</span><span class="s1">pop</span><span class="s3">(</span><span class="s4">false</span><span class="s3">),</span>
+            <span class="s1">child</span><span class="s3">: </span><span class="s4">const </span><span class="s1">Text</span><span class="s3">(</span><span class="s2">'Cancel'</span><span class="s3">),</span>
+          <span class="s3">),</span>
+          <span class="s1">ElevatedButton</span><span class="s3">(</span>
+            <span class="s1">onPressed</span><span class="s3">: () =&gt; </span><span class="s1">Navigator</span><span class="s3">.</span><span class="s1">of</span><span class="s3">(</span><span class="s1">context</span><span class="s3">).</span><span class="s1">pop</span><span class="s3">(</span><span class="s4">true</span><span class="s3">),</span>
+            <span class="s1">style</span><span class="s3">: </span><span class="s1">ElevatedButton</span><span class="s3">.</span><span class="s1">styleFrom</span><span class="s3">(</span><span class="s1">backgroundColor</span><span class="s3">: </span><span class="s1">Colors</span><span class="s3">.</span><span class="s1">green</span><span class="s3">),</span>
+            <span class="s1">child</span><span class="s3">: </span><span class="s4">const </span><span class="s1">Text</span><span class="s3">(</span><span class="s2">'Yes'</span><span class="s3">),</span>
+          <span class="s3">),</span>
+        <span class="s3">],</span>
+      <span class="s3">),</span>
+    <span class="s3">)) ??</span>
+        <span class="s4">false</span><span class="s3">;</span>
+  <span class="s3">}</span>
+
+  <span class="s1">Future</span><span class="s3">&lt;</span><span class="s4">void</span><span class="s3">&gt; </span><span class="s1">_addOrEditIncome</span><span class="s3">({</span><span class="s1">Map</span><span class="s3">&lt;</span><span class="s1">String</span><span class="s3">, </span><span class="s1">dynamic</span><span class="s3">&gt;? </span><span class="s1">income</span><span class="s3">}) </span><span class="s1">async </span><span class="s3">{</span>
+    <span class="s4">final </span><span class="s1">controller </span><span class="s3">= </span><span class="s1">TextEditingController</span><span class="s3">(</span>
+        <span class="s1">text</span><span class="s3">: </span><span class="s1">income </span><span class="s3">!= </span><span class="s4">null </span><span class="s3">? </span><span class="s1">income</span><span class="s3">[</span><span class="s2">'amount'</span><span class="s3">].</span><span class="s1">toString</span><span class="s3">() : </span><span class="s2">''</span><span class="s3">);</span>
+    <span class="s1">DateTime selectedDateLocal </span><span class="s3">=</span>
+    <span class="s1">income </span><span class="s3">!= </span><span class="s4">null </span><span class="s3">? </span><span class="s1">DateTime</span><span class="s3">.</span><span class="s1">parse</span><span class="s3">(</span><span class="s1">income</span><span class="s3">[</span><span class="s2">'date'</span><span class="s3">]) : </span><span class="s1">DateTime</span><span class="s3">.</span><span class="s1">now</span><span class="s3">();</span>
+
+    <span class="s1">await showModalBottomSheet</span><span class="s3">(</span>
+      <span class="s1">isScrollControlled</span><span class="s3">: </span><span class="s4">true</span><span class="s3">,</span>
+      <span class="s1">context</span><span class="s3">: </span><span class="s1">context</span><span class="s3">,</span>
+      <span class="s1">backgroundColor</span><span class="s3">: </span><span class="s1">Colors</span><span class="s3">.</span><span class="s1">white</span><span class="s3">,</span>
+      <span class="s1">shape</span><span class="s3">: </span><span class="s4">const </span><span class="s1">RoundedRectangleBorder</span><span class="s3">(</span>
+        <span class="s1">borderRadius</span><span class="s3">: </span><span class="s1">BorderRadius</span><span class="s3">.</span><span class="s1">vertical</span><span class="s3">(</span><span class="s1">top</span><span class="s3">: </span><span class="s1">Radius</span><span class="s3">.</span><span class="s1">circular</span><span class="s3">(</span><span class="s5">24</span><span class="s3">)),</span>
+      <span class="s3">),</span>
+      <span class="s1">builder</span><span class="s3">: (</span><span class="s1">context</span><span class="s3">) =&gt; </span><span class="s1">Padding</span><span class="s3">(</span>
+        <span class="s1">padding</span><span class="s3">: </span><span class="s1">EdgeInsets</span><span class="s3">.</span><span class="s1">only</span><span class="s3">(</span>
+          <span class="s1">bottom</span><span class="s3">: </span><span class="s1">MediaQuery</span><span class="s3">.</span><span class="s1">of</span><span class="s3">(</span><span class="s1">context</span><span class="s3">).</span><span class="s1">viewInsets</span><span class="s3">.</span><span class="s1">bottom</span><span class="s3">,</span>
+          <span class="s1">top</span><span class="s3">: </span><span class="s5">24</span><span class="s3">,</span>
+          <span class="s1">left</span><span class="s3">: </span><span class="s5">24</span><span class="s3">,</span>
+          <span class="s1">right</span><span class="s3">: </span><span class="s5">24</span><span class="s3">,</span>
+        <span class="s3">),</span>
+        <span class="s1">child</span><span class="s3">: </span><span class="s1">SingleChildScrollView</span><span class="s3">(</span>
+          <span class="s1">child</span><span class="s3">: </span><span class="s1">Column</span><span class="s3">(</span>
+            <span class="s1">mainAxisSize</span><span class="s3">: </span><span class="s1">MainAxisSize</span><span class="s3">.</span><span class="s1">min</span><span class="s3">,</span>
+            <span class="s1">children</span><span class="s3">: [</span>
+              <span class="s1">Container</span><span class="s3">(</span>
+                <span class="s1">width</span><span class="s3">: </span><span class="s5">60</span><span class="s3">,</span>
+                <span class="s1">height</span><span class="s3">: </span><span class="s5">5</span><span class="s3">,</span>
+                <span class="s1">margin</span><span class="s3">: </span><span class="s4">const </span><span class="s1">EdgeInsets</span><span class="s3">.</span><span class="s1">only</span><span class="s3">(</span><span class="s1">bottom</span><span class="s3">: </span><span class="s5">16</span><span class="s3">),</span>
+                <span class="s1">decoration</span><span class="s3">: </span><span class="s1">BoxDecoration</span><span class="s3">(</span>
+                  <span class="s1">color</span><span class="s3">: </span><span class="s1">Colors</span><span class="s3">.</span><span class="s1">grey</span><span class="s3">[</span><span class="s5">400</span><span class="s3">],</span>
+                  <span class="s1">borderRadius</span><span class="s3">: </span><span class="s1">BorderRadius</span><span class="s3">.</span><span class="s1">circular</span><span class="s3">(</span><span class="s5">10</span><span class="s3">),</span>
+                <span class="s3">),</span>
+              <span class="s3">),</span>
+              <span class="s1">Text</span><span class="s3">(</span>
+                <span class="s1">income </span><span class="s3">== </span><span class="s4">null </span><span class="s3">? </span><span class="s2">'Add New Income' </span><span class="s3">: </span><span class="s2">'Edit Income'</span><span class="s3">,</span>
+                <span class="s1">style</span><span class="s3">: </span><span class="s4">const </span><span class="s1">TextStyle</span><span class="s3">(</span><span class="s1">fontSize</span><span class="s3">: </span><span class="s5">20</span><span class="s3">, </span><span class="s1">fontWeight</span><span class="s3">: </span><span class="s1">FontWeight</span><span class="s3">.</span><span class="s1">bold</span><span class="s3">),</span>
+              <span class="s3">),</span>
+              <span class="s4">const </span><span class="s1">SizedBox</span><span class="s3">(</span><span class="s1">height</span><span class="s3">: </span><span class="s5">24</span><span class="s3">),</span>
+              <span class="s1">TextField</span><span class="s3">(</span>
+                <span class="s1">controller</span><span class="s3">: </span><span class="s1">controller</span><span class="s3">,</span>
+                <span class="s1">keyboardType</span><span class="s3">: </span><span class="s4">const </span><span class="s1">TextInputType</span><span class="s3">.</span><span class="s1">numberWithOptions</span><span class="s3">(</span><span class="s1">decimal</span><span class="s3">: </span><span class="s4">true</span><span class="s3">),</span>
+                <span class="s1">decoration</span><span class="s3">: </span><span class="s1">InputDecoration</span><span class="s3">(</span>
+                  <span class="s1">prefixIcon</span><span class="s3">: </span><span class="s4">const </span><span class="s1">Icon</span><span class="s3">(</span><span class="s1">Icons</span><span class="s3">.</span><span class="s1">attach_money</span><span class="s3">),</span>
+                  <span class="s1">labelText</span><span class="s3">: </span><span class="s2">'Amount (RM)'</span><span class="s3">,</span>
+                  <span class="s1">border</span><span class="s3">: </span><span class="s1">OutlineInputBorder</span><span class="s3">(</span><span class="s1">borderRadius</span><span class="s3">: </span><span class="s1">BorderRadius</span><span class="s3">.</span><span class="s1">circular</span><span class="s3">(</span><span class="s5">12</span><span class="s3">)),</span>
+                <span class="s3">),</span>
+              <span class="s3">),</span>
+              <span class="s4">const </span><span class="s1">SizedBox</span><span class="s3">(</span><span class="s1">height</span><span class="s3">: </span><span class="s5">20</span><span class="s3">),</span>
+              <span class="s1">ListTile</span><span class="s3">(</span>
+                <span class="s1">contentPadding</span><span class="s3">: </span><span class="s1">EdgeInsets</span><span class="s3">.</span><span class="s1">zero</span><span class="s3">,</span>
+                <span class="s1">leading</span><span class="s3">: </span><span class="s4">const </span><span class="s1">Icon</span><span class="s3">(</span><span class="s1">Icons</span><span class="s3">.</span><span class="s1">calendar_today</span><span class="s3">),</span>
+                <span class="s1">title</span><span class="s3">: </span><span class="s4">const </span><span class="s1">Text</span><span class="s3">(</span><span class="s2">'Date'</span><span class="s3">),</span>
+                <span class="s1">subtitle</span><span class="s3">: </span><span class="s1">Text</span><span class="s3">(</span><span class="s1">DateFormat</span><span class="s3">(</span><span class="s2">'yyyy-MM-dd'</span><span class="s3">).</span><span class="s1">format</span><span class="s3">(</span><span class="s1">selectedDateLocal</span><span class="s3">)),</span>
+                <span class="s1">trailing</span><span class="s3">: </span><span class="s1">TextButton</span><span class="s3">(</span>
+                  <span class="s1">onPressed</span><span class="s3">: () </span><span class="s1">async </span><span class="s3">{</span>
+                    <span class="s4">final </span><span class="s1">picked </span><span class="s3">= </span><span class="s1">await showDatePicker</span><span class="s3">(</span>
+                      <span class="s1">context</span><span class="s3">: </span><span class="s1">context</span><span class="s3">,</span>
+                      <span class="s1">initialDate</span><span class="s3">: </span><span class="s1">selectedDateLocal</span><span class="s3">,</span>
+                      <span class="s1">firstDate</span><span class="s3">: </span><span class="s1">DateTime</span><span class="s3">(</span><span class="s5">2000</span><span class="s3">),</span>
+                      <span class="s1">lastDate</span><span class="s3">: </span><span class="s1">DateTime</span><span class="s3">.</span><span class="s1">now</span><span class="s3">(),</span>
+                    <span class="s3">);</span>
+                    <span class="s4">if </span><span class="s3">(</span><span class="s1">picked </span><span class="s3">!= </span><span class="s4">null</span><span class="s3">) {</span>
+                      <span class="s1">setState</span><span class="s3">(() =&gt; </span><span class="s1">selectedDateLocal </span><span class="s3">= </span><span class="s1">picked</span><span class="s3">);</span>
+                      <span class="s1">Navigator</span><span class="s3">.</span><span class="s1">pop</span><span class="s3">(</span><span class="s1">context</span><span class="s3">); </span><span class="s0">// Close and reopen to refresh UI</span>
+                      <span class="s1">await _addOrEditIncome</span><span class="s3">(</span><span class="s1">income</span><span class="s3">: </span><span class="s1">income</span><span class="s3">);</span>
+                    <span class="s3">}</span>
+                  <span class="s3">},</span>
+                  <span class="s1">child</span><span class="s3">: </span><span class="s4">const </span><span class="s1">Text</span><span class="s3">(</span><span class="s2">'Change'</span><span class="s3">),</span>
+                <span class="s3">),</span>
+              <span class="s3">),</span>
+              <span class="s4">const </span><span class="s1">SizedBox</span><span class="s3">(</span><span class="s1">height</span><span class="s3">: </span><span class="s5">30</span><span class="s3">),</span>
+              <span class="s1">ElevatedButton</span><span class="s3">.</span><span class="s1">icon</span><span class="s3">(</span>
+                <span class="s1">icon</span><span class="s3">: </span><span class="s1">Icon</span><span class="s3">(</span><span class="s1">income </span><span class="s3">== </span><span class="s4">null </span><span class="s3">? </span><span class="s1">Icons</span><span class="s3">.</span><span class="s1">add </span><span class="s3">: </span><span class="s1">Icons</span><span class="s3">.</span><span class="s1">save</span><span class="s3">, </span><span class="s1">color</span><span class="s3">: </span><span class="s1">Colors</span><span class="s3">.</span><span class="s1">black</span><span class="s3">),</span>
+                <span class="s1">label</span><span class="s3">: </span><span class="s1">Text</span><span class="s3">(</span>
+                  <span class="s1">income </span><span class="s3">== </span><span class="s4">null </span><span class="s3">? </span><span class="s2">'Add Income' </span><span class="s3">: </span><span class="s2">'Update Income'</span><span class="s3">,</span>
+                  <span class="s1">style</span><span class="s3">: </span><span class="s4">const </span><span class="s1">TextStyle</span><span class="s3">(</span><span class="s1">color</span><span class="s3">: </span><span class="s1">Colors</span><span class="s3">.</span><span class="s1">black</span><span class="s3">, </span><span class="s1">fontWeight</span><span class="s3">: </span><span class="s1">FontWeight</span><span class="s3">.</span><span class="s1">bold</span><span class="s3">),</span>
+                <span class="s3">),</span>
+                <span class="s1">style</span><span class="s3">: </span><span class="s1">ElevatedButton</span><span class="s3">.</span><span class="s1">styleFrom</span><span class="s3">(</span>
+                  <span class="s1">backgroundColor</span><span class="s3">: </span><span class="s1">_gold</span><span class="s3">,</span>
+                  <span class="s1">minimumSize</span><span class="s3">: </span><span class="s4">const </span><span class="s1">Size</span><span class="s3">.</span><span class="s1">fromHeight</span><span class="s3">(</span><span class="s5">48</span><span class="s3">),</span>
+                  <span class="s1">shape</span><span class="s3">: </span><span class="s1">RoundedRectangleBorder</span><span class="s3">(</span><span class="s1">borderRadius</span><span class="s3">: </span><span class="s1">BorderRadius</span><span class="s3">.</span><span class="s1">circular</span><span class="s3">(</span><span class="s5">12</span><span class="s3">)),</span>
+                <span class="s3">),</span>
+                <span class="s1">onPressed</span><span class="s3">: () </span><span class="s1">async </span><span class="s3">{</span>
+                  <span class="s4">final </span><span class="s1">input </span><span class="s3">= </span><span class="s1">controller</span><span class="s3">.</span><span class="s1">text</span><span class="s3">.</span><span class="s1">trim</span><span class="s3">();</span>
+                  <span class="s4">final </span><span class="s1">amount </span><span class="s3">= </span><span class="s1">double</span><span class="s3">.</span><span class="s1">tryParse</span><span class="s3">(</span><span class="s1">input</span><span class="s3">);</span>
+                  <span class="s4">if </span><span class="s3">(</span><span class="s1">amount </span><span class="s3">== </span><span class="s4">null </span><span class="s3">|| </span><span class="s1">amount </span><span class="s3">&lt;= </span><span class="s5">0</span><span class="s3">) {</span>
+                    <span class="s1">ScaffoldMessenger</span><span class="s3">.</span><span class="s1">of</span><span class="s3">(</span><span class="s1">context</span><span class="s3">).</span><span class="s1">showSnackBar</span><span class="s3">(</span>
+                      <span class="s4">const </span><span class="s1">SnackBar</span><span class="s3">(</span><span class="s1">content</span><span class="s3">: </span><span class="s1">Text</span><span class="s3">(</span><span class="s2">'Enter a valid positive amount.'</span><span class="s3">)),</span>
+                    <span class="s3">);</span>
+                    <span class="s4">return</span><span class="s3">;</span>
+                  <span class="s3">}</span>
+
+                  <span class="s4">final </span><span class="s1">confirmed </span><span class="s3">= </span><span class="s1">await _showConfirmationDialog</span><span class="s3">(</span>
+                      <span class="s1">income </span><span class="s3">== </span><span class="s4">null</span>
+                          <span class="s3">? </span><span class="s2">'Are you sure you want to add this income?'</span>
+                          <span class="s3">: </span><span class="s2">'Are you sure you want to update this income?'</span><span class="s3">);</span>
+
+                  <span class="s4">if </span><span class="s3">(!</span><span class="s1">confirmed</span><span class="s3">) </span><span class="s4">return</span><span class="s3">;</span>
+
+                  <span class="s4">final </span><span class="s1">url </span><span class="s3">= </span><span class="s1">income </span><span class="s3">== </span><span class="s4">null</span>
+                      <span class="s3">? </span><span class="s2">'http://192.168.0.15/add_income.php'</span>
+                      <span class="s3">: </span><span class="s2">'http://192.168.0.15/update_income.php'</span><span class="s3">;</span>
+
+                  <span class="s4">final </span><span class="s1">response </span><span class="s3">= </span><span class="s1">await http</span><span class="s3">.</span><span class="s1">post</span><span class="s3">(</span><span class="s1">Uri</span><span class="s3">.</span><span class="s1">parse</span><span class="s3">(</span><span class="s1">url</span><span class="s3">), </span><span class="s1">body</span><span class="s3">: {</span>
+                    <span class="s2">'email'</span><span class="s3">: </span><span class="s1">widget</span><span class="s3">.</span><span class="s1">email</span><span class="s3">,</span>
+                    <span class="s2">'amount'</span><span class="s3">: </span><span class="s1">amount</span><span class="s3">.</span><span class="s1">toString</span><span class="s3">(),</span>
+                    <span class="s2">'date'</span><span class="s3">: </span><span class="s1">DateFormat</span><span class="s3">(</span><span class="s2">'yyyy-MM-dd'</span><span class="s3">).</span><span class="s1">format</span><span class="s3">(</span><span class="s1">selectedDateLocal</span><span class="s3">),</span>
+                    <span class="s4">if </span><span class="s3">(</span><span class="s1">income </span><span class="s3">!= </span><span class="s4">null</span><span class="s3">) </span><span class="s2">'id'</span><span class="s3">: </span><span class="s1">income</span><span class="s3">[</span><span class="s2">'id'</span><span class="s3">].</span><span class="s1">toString</span><span class="s3">(),</span>
+                  <span class="s3">});</span>
+
+                  <span class="s4">if </span><span class="s3">(</span><span class="s1">response</span><span class="s3">.</span><span class="s1">statusCode </span><span class="s3">== </span><span class="s5">200 </span><span class="s3">&amp;&amp; </span><span class="s1">response</span><span class="s3">.</span><span class="s1">body</span><span class="s3">.</span><span class="s1">trim</span><span class="s3">() == </span><span class="s2">'success'</span><span class="s3">) {</span>
+                    <span class="s1">Navigator</span><span class="s3">.</span><span class="s1">pop</span><span class="s3">(</span><span class="s1">context</span><span class="s3">);</span>
+                    <span class="s1">await _fetchTotalIncome</span><span class="s3">();</span>
+                    <span class="s4">if </span><span class="s3">(</span><span class="s1">_showList</span><span class="s3">) </span><span class="s1">await _fetchIncomeList</span><span class="s3">();</span>
+                  <span class="s3">} </span><span class="s4">else </span><span class="s3">{</span>
+                    <span class="s1">ScaffoldMessenger</span><span class="s3">.</span><span class="s1">of</span><span class="s3">(</span><span class="s1">context</span><span class="s3">).</span><span class="s1">showSnackBar</span><span class="s3">(</span>
+                      <span class="s1">SnackBar</span><span class="s3">(</span><span class="s1">content</span><span class="s3">: </span><span class="s1">Text</span><span class="s3">(</span><span class="s2">'Error: </span><span class="s3">${</span><span class="s1">response</span><span class="s3">.</span><span class="s1">body</span><span class="s3">.</span><span class="s1">trim</span><span class="s3">()}</span><span class="s2">'</span><span class="s3">)),</span>
+                    <span class="s3">);</span>
+                  <span class="s3">}</span>
+                <span class="s3">},</span>
+              <span class="s3">),</span>
+              <span class="s4">const </span><span class="s1">SizedBox</span><span class="s3">(</span><span class="s1">height</span><span class="s3">: </span><span class="s5">20</span><span class="s3">),</span>
+            <span class="s3">],</span>
+          <span class="s3">),</span>
+        <span class="s3">),</span>
+      <span class="s3">),</span>
+    <span class="s3">);</span>
+  <span class="s3">}</span>
+
+  <span class="s1">Future</span><span class="s3">&lt;</span><span class="s4">void</span><span class="s3">&gt; </span><span class="s1">_confirmDelete</span><span class="s3">(</span><span class="s1">int id</span><span class="s3">) </span><span class="s1">async </span><span class="s3">{</span>
+    <span class="s4">final </span><span class="s1">confirmed </span><span class="s3">=</span>
+    <span class="s1">await _showConfirmationDialog</span><span class="s3">(</span><span class="s2">'Are you sure you want to delete this income entry?'</span><span class="s3">);</span>
+
+    <span class="s4">if </span><span class="s3">(</span><span class="s1">confirmed</span><span class="s3">) {</span>
+      <span class="s4">final </span><span class="s1">res </span><span class="s3">= </span><span class="s1">await http</span><span class="s3">.</span><span class="s1">post</span><span class="s3">(</span>
+        <span class="s1">Uri</span><span class="s3">.</span><span class="s1">parse</span><span class="s3">(</span><span class="s2">'http://192.168.0.15/delete_income.php'</span><span class="s3">),</span>
+        <span class="s1">body</span><span class="s3">: {</span><span class="s2">'id'</span><span class="s3">: </span><span class="s1">id</span><span class="s3">.</span><span class="s1">toString</span><span class="s3">(), </span><span class="s2">'email'</span><span class="s3">: </span><span class="s1">widget</span><span class="s3">.</span><span class="s1">email</span><span class="s3">},</span>
+      <span class="s3">);</span>
+      <span class="s4">if </span><span class="s3">(</span><span class="s1">res</span><span class="s3">.</span><span class="s1">statusCode </span><span class="s3">== </span><span class="s5">200 </span><span class="s3">&amp;&amp; </span><span class="s1">res</span><span class="s3">.</span><span class="s1">body</span><span class="s3">.</span><span class="s1">trim</span><span class="s3">() == </span><span class="s2">'success'</span><span class="s3">) {</span>
+        <span class="s1">await _fetchTotalIncome</span><span class="s3">();</span>
+        <span class="s1">await _fetchIncomeList</span><span class="s3">();</span>
+      <span class="s3">} </span><span class="s4">else </span><span class="s3">{</span>
+        <span class="s1">ScaffoldMessenger</span><span class="s3">.</span><span class="s1">of</span><span class="s3">(</span><span class="s1">context</span><span class="s3">)</span>
+            <span class="s3">.</span><span class="s1">showSnackBar</span><span class="s3">(</span><span class="s1">SnackBar</span><span class="s3">(</span><span class="s1">content</span><span class="s3">: </span><span class="s1">Text</span><span class="s3">(</span><span class="s2">'Delete failed: </span><span class="s3">${</span><span class="s1">res</span><span class="s3">.</span><span class="s1">body</span><span class="s3">}</span><span class="s2">'</span><span class="s3">)));</span>
+      <span class="s3">}</span>
+    <span class="s3">}</span>
+  <span class="s3">}</span>
+
+  <span class="s1">Widget _buildTotalIncomeCard</span><span class="s3">() {</span>
+    <span class="s4">return </span><span class="s1">Container</span><span class="s3">(</span>
+      <span class="s1">width</span><span class="s3">: </span><span class="s1">double</span><span class="s3">.</span><span class="s1">infinity</span><span class="s3">,</span>
+      <span class="s1">padding</span><span class="s3">: </span><span class="s4">const </span><span class="s1">EdgeInsets</span><span class="s3">.</span><span class="s1">all</span><span class="s3">(</span><span class="s5">24</span><span class="s3">),</span>
+      <span class="s1">decoration</span><span class="s3">: </span><span class="s1">BoxDecoration</span><span class="s3">(</span>
+        <span class="s1">color</span><span class="s3">: </span><span class="s1">_gold</span><span class="s3">.</span><span class="s1">withOpacity</span><span class="s3">(</span><span class="s5">0.15</span><span class="s3">),</span>
+        <span class="s1">border</span><span class="s3">: </span><span class="s1">Border</span><span class="s3">.</span><span class="s1">all</span><span class="s3">(</span><span class="s1">color</span><span class="s3">: </span><span class="s1">_gold</span><span class="s3">, </span><span class="s1">width</span><span class="s3">: </span><span class="s5">1.4</span><span class="s3">),</span>
+        <span class="s1">borderRadius</span><span class="s3">: </span><span class="s1">BorderRadius</span><span class="s3">.</span><span class="s1">circular</span><span class="s3">(</span><span class="s5">20</span><span class="s3">),</span>
+      <span class="s3">),</span>
+      <span class="s1">child</span><span class="s3">: </span><span class="s1">_loadingTotal</span>
+          <span class="s3">? </span><span class="s4">const </span><span class="s1">Center</span><span class="s3">(</span><span class="s1">child</span><span class="s3">: </span><span class="s1">CircularProgressIndicator</span><span class="s3">(</span><span class="s1">color</span><span class="s3">: </span><span class="s1">_gold</span><span class="s3">))</span>
+          <span class="s3">: </span><span class="s1">Column</span><span class="s3">(</span>
+        <span class="s1">mainAxisSize</span><span class="s3">: </span><span class="s1">MainAxisSize</span><span class="s3">.</span><span class="s1">min</span><span class="s3">,</span>
+        <span class="s1">children</span><span class="s3">: [</span>
+          <span class="s4">const </span><span class="s1">Text</span><span class="s3">(</span><span class="s2">'Total Income'</span><span class="s3">,</span>
+              <span class="s1">style</span><span class="s3">:</span>
+              <span class="s1">TextStyle</span><span class="s3">(</span><span class="s1">fontSize</span><span class="s3">: </span><span class="s5">16</span><span class="s3">, </span><span class="s1">fontWeight</span><span class="s3">: </span><span class="s1">FontWeight</span><span class="s3">.</span><span class="s1">w500</span><span class="s3">)),</span>
+          <span class="s4">const </span><span class="s1">SizedBox</span><span class="s3">(</span><span class="s1">height</span><span class="s3">: </span><span class="s5">6</span><span class="s3">),</span>
+          <span class="s1">Text</span><span class="s3">(</span><span class="s2">'RM </span><span class="s3">${</span><span class="s1">_totalIncome</span><span class="s3">.</span><span class="s1">toStringAsFixed</span><span class="s3">(</span><span class="s5">2</span><span class="s3">)}</span><span class="s2">'</span><span class="s3">,</span>
+              <span class="s1">style</span><span class="s3">: </span><span class="s4">const </span><span class="s1">TextStyle</span><span class="s3">(</span>
+                  <span class="s1">fontSize</span><span class="s3">: </span><span class="s5">32</span><span class="s3">, </span><span class="s1">fontWeight</span><span class="s3">: </span><span class="s1">FontWeight</span><span class="s3">.</span><span class="s1">bold</span><span class="s3">)),</span>
+        <span class="s3">],</span>
+      <span class="s3">),</span>
+    <span class="s3">);</span>
+  <span class="s3">}</span>
+
+  <span class="s1">Widget _buildToggleButton</span><span class="s3">() {</span>
+    <span class="s4">return </span><span class="s1">OutlinedButton</span><span class="s3">.</span><span class="s1">icon</span><span class="s3">(</span>
+      <span class="s1">icon</span><span class="s3">:</span>
+      <span class="s1">Icon</span><span class="s3">(</span><span class="s1">_showList </span><span class="s3">? </span><span class="s1">Icons</span><span class="s3">.</span><span class="s1">expand_less </span><span class="s3">: </span><span class="s1">Icons</span><span class="s3">.</span><span class="s1">expand_more</span><span class="s3">, </span><span class="s1">color</span><span class="s3">: </span><span class="s1">_gold</span><span class="s3">),</span>
+      <span class="s1">label</span><span class="s3">: </span><span class="s1">Text</span><span class="s3">(</span><span class="s1">_showList </span><span class="s3">? </span><span class="s2">'Hide Income List' </span><span class="s3">: </span><span class="s2">'View Income List'</span><span class="s3">,</span>
+          <span class="s1">style</span><span class="s3">: </span><span class="s4">const </span><span class="s1">TextStyle</span><span class="s3">(</span><span class="s1">fontSize</span><span class="s3">: </span><span class="s5">14</span><span class="s3">, </span><span class="s1">fontWeight</span><span class="s3">: </span><span class="s1">FontWeight</span><span class="s3">.</span><span class="s1">w500</span><span class="s3">)),</span>
+      <span class="s1">style</span><span class="s3">: </span><span class="s1">OutlinedButton</span><span class="s3">.</span><span class="s1">styleFrom</span><span class="s3">(</span>
+          <span class="s1">foregroundColor</span><span class="s3">: </span><span class="s1">_gold</span><span class="s3">,</span>
+          <span class="s1">side</span><span class="s3">: </span><span class="s4">const </span><span class="s1">BorderSide</span><span class="s3">(</span><span class="s1">color</span><span class="s3">: </span><span class="s1">_gold</span><span class="s3">),</span>
+          <span class="s1">shape</span><span class="s3">:</span>
+          <span class="s1">RoundedRectangleBorder</span><span class="s3">(</span><span class="s1">borderRadius</span><span class="s3">: </span><span class="s1">BorderRadius</span><span class="s3">.</span><span class="s1">circular</span><span class="s3">(</span><span class="s5">30</span><span class="s3">))),</span>
+      <span class="s1">onPressed</span><span class="s3">: () </span><span class="s1">async </span><span class="s3">{</span>
+        <span class="s1">setState</span><span class="s3">(() =&gt; </span><span class="s1">_showList </span><span class="s3">= !</span><span class="s1">_showList</span><span class="s3">);</span>
+        <span class="s4">if </span><span class="s3">(</span><span class="s1">_showList </span><span class="s3">&amp;&amp; </span><span class="s1">_incomes</span><span class="s3">.</span><span class="s1">isEmpty</span><span class="s3">) </span><span class="s1">await _fetchIncomeList</span><span class="s3">();</span>
+      <span class="s3">},</span>
+    <span class="s3">);</span>
+  <span class="s3">}</span>
+
+  <span class="s1">Widget _buildIncomeCard</span><span class="s3">(</span><span class="s1">Map</span><span class="s3">&lt;</span><span class="s1">String</span><span class="s3">, </span><span class="s1">dynamic</span><span class="s3">&gt; </span><span class="s1">inc</span><span class="s3">) {</span>
+    <span class="s4">final </span><span class="s1">amount </span><span class="s3">= </span><span class="s1">inc</span><span class="s3">[</span><span class="s2">'amount'</span><span class="s3">];</span>
+    <span class="s4">final </span><span class="s1">date </span><span class="s3">= </span><span class="s1">DateFormat</span><span class="s3">(</span><span class="s2">'yyyy-MM-dd'</span><span class="s3">).</span><span class="s1">format</span><span class="s3">(</span><span class="s1">DateTime</span><span class="s3">.</span><span class="s1">parse</span><span class="s3">(</span><span class="s1">inc</span><span class="s3">[</span><span class="s2">'date'</span><span class="s3">]));</span>
+    <span class="s4">return </span><span class="s1">Card</span><span class="s3">(</span>
+      <span class="s1">elevation</span><span class="s3">: </span><span class="s5">0</span><span class="s3">,</span>
+      <span class="s1">shape</span><span class="s3">: </span><span class="s1">RoundedRectangleBorder</span><span class="s3">(</span><span class="s1">borderRadius</span><span class="s3">: </span><span class="s1">BorderRadius</span><span class="s3">.</span><span class="s1">circular</span><span class="s3">(</span><span class="s5">16</span><span class="s3">)),</span>
+      <span class="s1">child</span><span class="s3">: </span><span class="s1">ListTile</span><span class="s3">(</span>
+        <span class="s1">title</span><span class="s3">: </span><span class="s1">Text</span><span class="s3">(</span><span class="s2">'RM </span><span class="s3">$</span><span class="s1">amount</span><span class="s2">'</span><span class="s3">,</span>
+            <span class="s1">style</span><span class="s3">: </span><span class="s4">const </span><span class="s1">TextStyle</span><span class="s3">(</span><span class="s1">fontWeight</span><span class="s3">: </span><span class="s1">FontWeight</span><span class="s3">.</span><span class="s1">bold</span><span class="s3">)),</span>
+        <span class="s1">subtitle</span><span class="s3">: </span><span class="s1">Text</span><span class="s3">(</span><span class="s1">date</span><span class="s3">),</span>
+        <span class="s1">trailing</span><span class="s3">: </span><span class="s1">Wrap</span><span class="s3">(</span>
+          <span class="s1">spacing</span><span class="s3">: </span><span class="s5">8</span><span class="s3">,</span>
+          <span class="s1">children</span><span class="s3">: [</span>
+            <span class="s1">IconButton</span><span class="s3">(</span>
+              <span class="s1">onPressed</span><span class="s3">: () =&gt; </span><span class="s1">_addOrEditIncome</span><span class="s3">(</span><span class="s1">income</span><span class="s3">: </span><span class="s1">inc</span><span class="s3">),</span>
+              <span class="s1">icon</span><span class="s3">: </span><span class="s4">const </span><span class="s1">Icon</span><span class="s3">(</span><span class="s1">Icons</span><span class="s3">.</span><span class="s1">edit</span><span class="s3">, </span><span class="s1">color</span><span class="s3">: </span><span class="s1">Colors</span><span class="s3">.</span><span class="s1">green</span><span class="s3">),</span>
+            <span class="s3">),</span>
+            <span class="s1">IconButton</span><span class="s3">(</span>
+              <span class="s1">onPressed</span><span class="s3">: () =&gt; </span><span class="s1">_confirmDelete</span><span class="s3">(</span><span class="s1">inc</span><span class="s3">[</span><span class="s2">'id'</span><span class="s3">]),</span>
+              <span class="s1">icon</span><span class="s3">: </span><span class="s4">const </span><span class="s1">Icon</span><span class="s3">(</span><span class="s1">Icons</span><span class="s3">.</span><span class="s1">delete</span><span class="s3">, </span><span class="s1">color</span><span class="s3">: </span><span class="s1">Colors</span><span class="s3">.</span><span class="s1">red</span><span class="s3">),</span>
+            <span class="s3">),</span>
+          <span class="s3">],</span>
+        <span class="s3">),</span>
+      <span class="s3">),</span>
+    <span class="s3">);</span>
+  <span class="s3">}</span>
+
+  <span class="s1">@override</span>
+  <span class="s1">Widget build</span><span class="s3">(</span><span class="s1">BuildContext context</span><span class="s3">) {</span>
+    <span class="s4">return </span><span class="s1">Scaffold</span><span class="s3">(</span>
+      <span class="s1">backgroundColor</span><span class="s3">: </span><span class="s1">Colors</span><span class="s3">.</span><span class="s1">white</span><span class="s3">,</span>
+      <span class="s1">appBar</span><span class="s3">: </span><span class="s1">AppBar</span><span class="s3">(</span>
+        <span class="s1">backgroundColor</span><span class="s3">: </span><span class="s1">_gold</span><span class="s3">,</span>
+        <span class="s1">title</span><span class="s3">: </span><span class="s4">const </span><span class="s1">Text</span><span class="s3">(</span><span class="s2">'Manage Income'</span><span class="s3">,</span>
+            <span class="s1">style</span><span class="s3">: </span><span class="s1">TextStyle</span><span class="s3">(</span><span class="s1">color</span><span class="s3">: </span><span class="s1">Colors</span><span class="s3">.</span><span class="s1">black</span><span class="s3">, </span><span class="s1">fontWeight</span><span class="s3">: </span><span class="s1">FontWeight</span><span class="s3">.</span><span class="s1">w600</span><span class="s3">)),</span>
+        <span class="s1">iconTheme</span><span class="s3">: </span><span class="s4">const </span><span class="s1">IconThemeData</span><span class="s3">(</span><span class="s1">color</span><span class="s3">: </span><span class="s1">Colors</span><span class="s3">.</span><span class="s1">black</span><span class="s3">),</span>
+        <span class="s1">centerTitle</span><span class="s3">: </span><span class="s4">true</span><span class="s3">,</span>
+      <span class="s3">),</span>
+      <span class="s1">floatingActionButton</span><span class="s3">: </span><span class="s1">FloatingActionButton</span><span class="s3">(</span>
+        <span class="s1">backgroundColor</span><span class="s3">: </span><span class="s1">_gold</span><span class="s3">,</span>
+        <span class="s1">onPressed</span><span class="s3">: () =&gt; </span><span class="s1">_addOrEditIncome</span><span class="s3">(),</span>
+        <span class="s1">child</span><span class="s3">: </span><span class="s4">const </span><span class="s1">Icon</span><span class="s3">(</span><span class="s1">Icons</span><span class="s3">.</span><span class="s1">add</span><span class="s3">, </span><span class="s1">color</span><span class="s3">: </span><span class="s1">Colors</span><span class="s3">.</span><span class="s1">black</span><span class="s3">),</span>
+      <span class="s3">),</span>
+      <span class="s1">body</span><span class="s3">: </span><span class="s1">SingleChildScrollView</span><span class="s3">(</span>
+        <span class="s1">padding</span><span class="s3">: </span><span class="s4">const </span><span class="s1">EdgeInsets</span><span class="s3">.</span><span class="s1">all</span><span class="s3">(</span><span class="s5">20</span><span class="s3">),</span>
+        <span class="s1">child</span><span class="s3">: </span><span class="s1">Column</span><span class="s3">(</span>
+          <span class="s1">children</span><span class="s3">: [</span>
+            <span class="s1">_buildTotalIncomeCard</span><span class="s3">(),</span>
+            <span class="s4">const </span><span class="s1">SizedBox</span><span class="s3">(</span><span class="s1">height</span><span class="s3">: </span><span class="s5">20</span><span class="s3">),</span>
+            <span class="s1">_buildToggleButton</span><span class="s3">(),</span>
+            <span class="s4">if </span><span class="s3">(</span><span class="s1">_showList</span><span class="s3">) </span><span class="s4">const </span><span class="s1">SizedBox</span><span class="s3">(</span><span class="s1">height</span><span class="s3">: </span><span class="s5">16</span><span class="s3">),</span>
+            <span class="s4">if </span><span class="s3">(</span><span class="s1">_showList</span><span class="s3">)</span>
+              <span class="s1">_loadingList</span>
+                  <span class="s3">? </span><span class="s4">const </span><span class="s1">Center</span><span class="s3">(</span>
+                  <span class="s1">child</span><span class="s3">: </span><span class="s1">CircularProgressIndicator</span><span class="s3">(</span><span class="s1">color</span><span class="s3">: </span><span class="s1">_gold</span><span class="s3">))</span>
+                  <span class="s3">: </span><span class="s1">_incomes</span><span class="s3">.</span><span class="s1">isEmpty</span>
+                  <span class="s3">? </span><span class="s4">const </span><span class="s1">Text</span><span class="s3">(</span><span class="s2">'No income records found.'</span><span class="s3">)</span>
+                  <span class="s3">: </span><span class="s1">ListView</span><span class="s3">.</span><span class="s1">separated</span><span class="s3">(</span>
+                <span class="s1">physics</span><span class="s3">: </span><span class="s4">const </span><span class="s1">NeverScrollableScrollPhysics</span><span class="s3">(),</span>
+                <span class="s1">shrinkWrap</span><span class="s3">: </span><span class="s4">true</span><span class="s3">,</span>
+                <span class="s1">itemCount</span><span class="s3">: </span><span class="s1">_incomes</span><span class="s3">.</span><span class="s1">length</span><span class="s3">,</span>
+                <span class="s1">separatorBuilder</span><span class="s3">: (</span><span class="s1">_</span><span class="s3">, </span><span class="s1">__</span><span class="s3">) =&gt;</span>
+                <span class="s4">const </span><span class="s1">SizedBox</span><span class="s3">(</span><span class="s1">height</span><span class="s3">: </span><span class="s5">8</span><span class="s3">),</span>
+                <span class="s1">itemBuilder</span><span class="s3">: (</span><span class="s1">ctx</span><span class="s3">, </span><span class="s1">i</span><span class="s3">) =&gt;</span>
+                    <span class="s1">_buildIncomeCard</span><span class="s3">(</span><span class="s1">_incomes</span><span class="s3">[</span><span class="s1">i</span><span class="s3">]),</span>
+              <span class="s3">),</span>
+          <span class="s3">],</span>
+        <span class="s3">),</span>
+      <span class="s3">),</span>
+    <span class="s3">);</span>
+  <span class="s3">}</span>
+<span class="s3">}</span>
+</pre>
+</body>
+</html>
