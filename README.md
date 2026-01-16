@@ -1,44 +1,95 @@
-EasyBudget AI
-EasyBudget AI is a mobile application developed to help users manage their personal finances more efficiently. The app allows users to track expenses, scan receipts using OCR, and view spending summaries through a simple and user-friendly interface.
+# 💰 EasyBudget AI  
+### 🏆 Gold Medal Winner – Jejak Inovasi 2025
 
-Project Overview
-Managing daily expenses manually can be time-consuming and error-prone. EasyBudget AI simplifies this process by allowing users to scan receipts and automatically extract expense information, reducing manual input and improving accuracy.
+EasyBudget AI is a **smart mobile finance application** designed to simplify personal expense management.  
+By leveraging **OCR (Optical Character Recognition)** technology, the app automatically extracts data from receipts, reducing manual input and helping users build better financial discipline effortlessly.
 
-This project was developed as part of my academic work and later enhanced for innovation competitions.
+---
 
-Key Features
-OCR-based receipt scanning
-Automatic expense data extraction
-Manual expense entry
-Expense categorization
-Monthly spending summary
-Tax-related expense tracking
-Technologies Used
-Flutter (Mobile Application)
-PHP (Backend API)
-MySQL (Database)
-Tesseract OCR
-RESTful APIs
-Android Studio
-Git & GitHub
-My Role
-Lead Developer
-Designed the overall system architecture
-Developed the mobile application using Flutter
-Implemented OCR receipt scanning functionality
-Built backend APIs and database structure
-Integrated frontend and backend services
-Performed testing, debugging, and feature improvements
-Achievements
-Gold Medal – Jejak Inovasi 2025
-Fully developed and presented as an academic innovation project
-Demo Video
-A short demonstration of the application can be viewed here: https://youtu.be/45goi5951U8
+## 🎥 Demo Video
+📺 **Watch the app in action:**  
+👉 *[Insert your demo video link here]*
 
-Future Improvements
-AI-based spending predictions
-Cloud data synchronization
-Improved OCR accuracy
-Budget goal recommendations
-Notes
-This project is intended for learning and demonstration purposes. Sensitive information such as API keys and credentials have been excluded from this repository.
+---
+
+## 🚀 Key Features
+
+📸 **Smart Receipt Scanning**  
+- Scan physical or digital receipts using **Tesseract OCR**
+- Automatically detect key expense information
+
+🤖 **Automated Expense Tracking**  
+- Extracts **date, amount, and item details**
+- Minimizes human error and manual work
+
+📊 **Spending Analytics**  
+- Monthly summaries and visual charts
+- Helps users understand spending patterns
+
+📑 **Tax Readiness**  
+- Dedicated tracking for **tax-deductible expenses**
+- Makes tax preparation easier and more organized
+
+⌨️ **Manual Entry**  
+- Quick input for cash or unsupported receipts
+- Flexible and user-friendly
+
+---
+
+## 🛠️ Tech Stack
+
+| Category | Technology |
+|--------|------------|
+| **Frontend** | Flutter (Dart) |
+| **Backend** | PHP (RESTful API) |
+| **Database** | MySQL |
+| **OCR Engine** | Tesseract OCR |
+| **Tools** | Android Studio, Git, GitHub |
+
+---
+
+## 🏗️ System Architecture
+
+As the **Lead Developer**, I designed and developed the full-stack system:
+
+- 📱 **Mobile Client**  
+  Built using Flutter for a smooth, cross-platform user experience.
+
+- 🔍 **OCR Pipeline**  
+  Integrated Tesseract OCR to process receipt images and convert text into structured JSON data.
+
+- 🌐 **API Layer**  
+  PHP-based RESTful API for secure and efficient communication between the app and database.
+
+- 🗄️ **Database**  
+  MySQL schema designed for efficient storage and retrieval of user financial records.
+
+---
+
+## 📈 Future Roadmap
+
+- [ ] 🤖 **AI Spending Predictions**  
+      Predict future expenses using machine learning  
+- [ ] ☁️ **Cloud Sync**  
+      Real-time synchronization across devices  
+- [ ] 📸 **Advanced OCR Accuracy**  
+      Integrate Google Vision API  
+- [ ] 🎯 **Smart Budgeting**  
+      AI-driven recommendations based on savings goals  
+
+---
+
+## 📝 Notes
+
+This project was developed for **academic and innovation purposes**.  
+All API keys, credentials, and sensitive information have been **removed for security reasons**.
+
+---
+
+## 👩‍💻 Author
+
+**Nuralia Amanda**  
+Diploma in Information Technology (Software)  
+Lead Developer – EasyBudget AI
+
+🌟 If you like this project, feel free to **star the repository**!
