@@ -8,7 +8,7 @@ By leveraging **OCR (Optical Character Recognition)** technology, the app automa
 
 ## 🎥 Demo Video
 📺 **Watch the app in action:**  
-👉 *[Insert your demo video link here]*
+👉 *https://youtu.be/45goi5951U8?si=brhKlr_9vfxJJsgN*
 
 ---
 
